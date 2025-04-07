@@ -1,0 +1,370 @@
+
+
+...> https://www.cloudnweb.dev/2021/4/pagination-nodejs-mongoose
+
+...> https://www.slingacademy.com/article/implement-pagination-express-js/
+
+
+...> https://medium.com/@atacanymc/implementing-pagination-in-an-express-js-application-551244b62d48
+
+
+
+
+PAGINATION IN EXPRESS:
+
+..> In the context of an Express.js application, pagination refers to the technique of dividing a large dataset into smaller, manageable pages or chunks for display, improving user experience and application performance, especially when dealing with extensive data. 
+
+..> Instead of loading and displaying all data at once, which can be slow and overwhelming, pagination allows users to browse data in smaller, more digestible portions. 
+
+..> Pagination is crucial for building scalable applications that can handle large datasets efficientl
+
+
+
+Types of pagination
+In general, There are two types of pagination. they are,
+
+Offset based pagination
+Cursor based pagination
+Offset based pagination
+It is one of the most common pagination methods we are using for decades. It simply uses limit and offset in SQL queries to paginate the data from database.
+
+
+
+
+
+
+
+How Pagination Works in Express.js
+1. Server-Side Pagination:
+The server (your Express.js application) is responsible for fetching and processing the data, and then sending only the relevant page of data to the client. 
+2. Client Request:
+The client (e.g., a web application) sends a request to the server, specifying the desired page number and the number of items to display per page (e.g., page=2&limit=10). 
+3. Server-Side Processing:
+The server uses this information to query the database (or other data source) and retrieve only the data for the requested page. 
+4. Response to Client:
+The server sends the paginated data (the specific page of data) back to the client. 
+5. Display on Client:
+The client then displays the received data on the user interface, along with pagination controls (e.g., "Previous", "Next", page numbers) to allow users to navigate between pages. 
+
+
+
+Pagination in Express (or any application) is a way to split a large amount of data into smaller, manageable chunks, making it easier to view and process. Instead of showing thousands of records all at once, pagination allows users to see data page by page—like browsing through a book one chapter at a time.
+
+Here are key terms explained simply:
+
+Limit: Determines how many records (or rows of data) to display on a single page. For example, setting limit = 10 means each page will show 10 results.
+
+Offset: Specifies how many records to skip before starting to display the results. For example, offset = 20 means skip the first 20 records and start showing results from the 21st record onward.
+
+Skip: Similar to Offset, it’s another way of specifying how many records to ignore before showing the data. It’s often used in databases like MongoDB.
+
+Example Pagination Route in Express
+Here’s a simple example for handling pagination:
+ 
+const express = require('express');
+const app = express();
+const port = 3000;
+
+// Sample data (array of items)
+const data = [
+    { id: 1, name: 'Item 1' },
+    { id: 2, name: 'Item 2' },
+    { id: 3, name: 'Item 3' },
+    // ... more items
+];
+
+app.get('/items', (req, res) => {
+    const limit = parseInt(req.query.limit) || 10; // Default limit is 10
+    const skip = parseInt(req.query.skip) || 0;   // Default skip is 0
+    
+    // Perform pagination
+    const paginatedData = data.slice(skip, skip + limit);
+
+    res.json({ items: paginatedData, total: data.length });
+});
+
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+});
+
+
+
+Explanation:
+The limit and skip values come from the query parameters in the URL (e.g., /items?limit=5&skip=10).
+
+The data.slice(skip, skip + limit) method selects the appropriate chunk of data based on the limit and skip values.
+
+The server responds with paginated data and the total number of items.
+
+
+
+const express = require("express");
+const mongoose = require("mongoose");
+
+const app = express();
+
+// Define a schema and model for demonstration
+const ItemSchema = new mongoose.Schema({ name: String });
+const Item = mongoose.model("Item", ItemSchema);
+
+// Pagination route
+app.get("/items", async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1; // Current page number (default to 1)
+        const pageSize = parseInt(req.query.pageSize) || 10; // Number of items per page (default to 10)
+
+        const totalItems = await Item.countDocuments(); // Total number of items
+        const totalPages = Math.ceil(totalItems / pageSize); // Calculate total pages
+
+        const items = await Item.find()
+            .skip((page - 1) * pageSize) // Skip items for previous pages
+            .limit(pageSize); // Limit items for the current page
+
+        res.json({
+            page,
+            pageSize,
+            totalPages,
+            totalItems,
+            items,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+
+// Connect to MongoDB and start the server
+mongoose.connect("mongodb://localhost:27017/pagination", { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => app.listen(3000, () => console.log("Server is running on port 3000")))
+    .catch(error => console.error("MongoDB connection error:", error));
+
+
+How It Works:
+Query Parameters: Use page and pageSize from the request query to define the pagination settings.
+
+MongoDB skip: Skips a certain number of documents based on (page - 1) * pageSize.
+
+MongoDB limit: Limits the number of documents retrieved to pageSize.
+
+Example Usage:
+Start your server.
+
+Make a request like http://localhost:3000/items?page=2&pageSize=5.
+
+This retrieves the second page of items with 5 items per page.
+
+
+how to implement the the routes using the :
+
+
+
+
+
+
+
+
+
+middleware:
+================>
+
+
+export default async (req, res, next) => {
+  let authHeader = req.headers["authorization"];
+  let token = authHeader && authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ error: "No token provided" });
+  }
+
+  try {
+    // Verify the JWT token
+    let decoded = jwt.verify(token, process.env.SEC);
+    let userId = decoded.id;
+
+    // Check if the user has an active session in the Logs model
+    const userLogs = await Logs.findOne({ UserId: userId });
+
+    if (!userLogs || userLogs.UserToken === null) {
+      return res
+        .status(StatusCodes.NOT_ACCEPTABLE)
+        .json({ error: "User is logged out" });
+    }
+
+    // Attach user info to the request object
+    req.user = decoded;
+    next(); // Pass control to the next middleware or route handler
+  } catch (err) {
+    console.log("Server error in the middleware:", err);
+    Sentry.captureException(err);
+
+    return res
+      .status(StatusCodes.UNAUTHORIZED)
+      .json({ error: "Invalid token" });
+  }
+};
+
+
+
+
+
+
+route hadler:
+================== >
+
+import express from "express";
+import auth from "../middleware/authmiddle.js";
+import { validateProduct } from "../validation/productValidation.js";
+import { AddingProduct } from "../controllers/productController.js";
+
+const router = express.Router();
+
+router.post("/addproduct", auth, validateProduct, async (req, res) => {
+  try {
+    await AddingProduct(req, res);
+  } catch (err) {
+    console.error("Error in adding product:", err);
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "Something went wrong" });
+  }
+});
+
+export default router;
+
+
+
+import Joi from "joi";
+
+// Define validation schema
+export const productSchema = Joi.object({
+  name: Joi.string().min(3).required(),
+  price: Joi.number().positive().required(),
+  description: Joi.string().optional(),
+  // Add other fields as needed
+});
+
+// Middleware for validation
+export const validateProduct = (req, res, next) => {
+  const { error } = productSchema.validate(req.body);
+  if (error) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      error: "Validation error",
+      message: error.details[0].message,
+    });
+  }
+  next();
+};
+
+
+this is my joi validation code :
+import express from "express";
+import joi from "joi";
+
+const app = express();
+app.use(express.json());
+
+const EMcreateEventValidation = joi.object({
+  productName: joi.string().required().trim(),
+  productDescription: joi.string().required().trim(),
+
+  price: joi.number().min(1).required().strict(),
+
+  quantityAvailable: joi.number().min(10).required().strict(),
+  manufactureredBy: joi.string().required().trim(),
+
+  Ratings: joi.number().required().strict(),
+  Bookedproducts: joi.number().required().strict(),
+  category: joi.string().required().trim(),
+});
+
+EMcreateEventValidation.requiredFieldsValidation = (data) => {
+  const requiredFields = [
+    "productName",
+    "productDescription",
+    "price",
+    "quantityAvailable",
+    "manufactureredBy",
+    "Ratings",
+    "Bookedproducts",
+    "category",
+  ];
+
+  for (let field of requiredFields) {
+    if (!(field in data)) {
+      return {
+        error: {
+          message: "Missing required fields in the body@@@",
+        },
+      };
+    }
+  }
+  return { error: null };
+};
+
+export default EMcreateEventValidation;
+
+
+which i will import it and it the in the route :
+like this : 
+import EMcreateEventValidation from "../validators/products.js";
+
+router.post("/addproduct", async (req, res) => {
+  let { error: missingFieldsError } =
+    EMcreateEventValidation.requiredFieldsValidation(req.body);
+
+  if (missingFieldsError) {
+    return res.status(StatusCodes.FORBIDDEN).json({
+      error: ReasonPhrases.BAD_REQUEST,
+      message: "Missing required fields in the body while adding the products",
+    });
+  }
+
+  let { error: validateError } = EMcreateEventValidation.validate(req.body);
+
+  if (validateError) {
+    return res.status(StatusCodes.NOT_FOUND).json({
+      error: ReasonPhrases.BAD_REQUEST,
+      message: "Invalid fields in the body while adding the products",
+    });
+  }
+
+  await auth(req, res);
+  await AddingProduct(req, res);
+});
+
+here this my route ,and iam using the async and await , this is myb middlwre   await auth(req, res); and this is my contoller await AddingProduct(req, res); which i writen in the contoller folder, i imported it in the route folder and using it but i need to using the next() , instead of it , so how to avoid the await and async,,
+==========>
+
+
+
+controller logic:
+----------------------------- > 
+
+const AddingProductMiddleware = (req, res, next) => {
+  try {
+    AddingProduct(req, res); // Assuming AddingProduct doesn't need to be awaited
+    next(); // Continue with further processing
+  } catch (err) {
+    next(err); // Pass the error to the error handling middleware
+  }
+};
+
+
+
+
+this is the route logic:
+----------------------------- >
+
+router.post("/addproduct", EMcreateEventValidation.requiredFieldsValidation, authMiddleware, AddingProductMiddleware, (req, res) => {
+  const { error: validateError } = EMcreateEventValidation.validate(req.body);
+
+  if (validateError) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      error: ReasonPhrases.BAD_REQUEST,
+      message: "Invalid fields in the body while adding the products",
+    });
+  }
+
+  res.status(StatusCodes.OK).json({ message: "Product added successfully" });
+});
+ 
