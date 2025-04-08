@@ -28,6 +28,30 @@ Cursor based pagination
 Offset based pagination
 It is one of the most common pagination methods we are using for decades. It simply uses limit and offset in SQL queries to paginate the data from database.
 
+Offset-Based Pagination (Skip & Limit)  Most common
+Uses skip and limit
+
+Like: show me page 2 with 10 items per page ➝ skip 10, limit 10
+
+2. Cursor-Based Pagination (Using _id or timestamp)
+Uses a reference value (like last _id) to get next set
+
+Faster for large datasets
+
+Great for infinite scroll or real-time data
+
+3. Keyset-Based Pagination (Advanced version of cursor)
+Instead of page numbers, uses unique keys (like createdAt)
+
+Super-efficient for high-scale apps like Twitter
+
+
+const page = Math.max(1, parseInt(req.query.page) || 1);
+const limit = Math.min(100, parseInt(req.query.limit) || 10); // Max 100 per page
+
+Offset Pagination	Simple, supports page numbers	Admin panels, blogs
+Cursor Pagination	Fast for large data sets	Infinite scroll, feeds
+Keyset Pagination	Super-fast, sorted data only	Twitter-style timelines
 
 
 
