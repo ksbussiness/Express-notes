@@ -1,0 +1,130 @@
+Nginx is the front gate.
+
+Node.js is the backend worker.
+
+Nginx receives requests from users and forwards them to Node.js.
+
+Node.js sends back responses, and Nginx delivers them to users.
+
+User's Browser (requests https://yourdomain.com)
+            |
+        [ Internet ]
+            |
+        [ Nginx (Port 80/443) ]
+            |
+        [ Node.js (Port 3000) ]
+            |
+        [ Your Application / Database ]
+
+Nginx works as a reverse proxy to:
+Receive HTTP requests from the internet (e.g., https://example.com)
+
+Forward those requests to your Node.js app running on a different port (e.g., localhost:3000)
+
+Return the response from Node.js back to the client
+
+
+
+What is a Reverse Proxy?
+A reverse proxy is a server that:
+
+Takes requests from users and forwards them to your actual backend server (like Node.js) — then gives the response back to the user.
+
+So the user never talks directly to your Node.js app — they only talk to Nginx, and Nginx talks to your app.
+
+
+
+
+There are two kinds of proxies:
+
+Type	Who it's for	Direction of traffic
+Forward Proxy	Used by clients to hide themselves	Client → Proxy → Internet
+Reverse Proxy	Used by servers to hide internal servers	Internet → Proxy → Backend
+
+
+
+Example Flow with Nginx as Reverse Proxy
+You visit:
+arduino
+Copy
+Edit
+https://yourdomain.com/api/users
+What happens:
+The request goes to Nginx (port 80/443).
+
+Nginx is configured to forward /api requests to http://localhost:3000.
+
+Node.js app running on port 3000 handles it.
+
+Response goes back to Nginx.
+
+Nginx sends it to the browser.
+
+So, to the user, it looks like yourdomain.com is handling everything — but really, Node.js is doing the work behind the scenes, and Nginx is managing the door.
+
+
+
+Performance Optimization
+NGINX is faster and more efficient at handling HTTP requests than raw Node.js.
+
+It can handle thousands of simultaneous connections easily (great for high-traffic apps).
+
+
+
+Handles HTTPS/SSL
+NGINX handles SSL certificates and encrypts traffic (HTTPS).
+
+You don’t have to write HTTPS logic in Node.js — NGINX takes care of it.
+
+
+
+
+Reverse Proxy
+Users connect to NGINX, not directly to your Node.js app.
+
+This gives an extra layer of security, isolation, and routing control.
+
+
+Static File Serving
+NGINX can serve images, CSS, JS files super fast.
+
+That leaves Node.js free to just handle the backend logic (APIs, DB).
+
+5. ⚖️ Load Balancing
+If you have multiple Node.js instances, NGINX can distribute (balance) traffic across them.
+
+Example: 4 Node.js servers → NGINX spreads users across them.
+
+6. 🔁 Caching
+NGINX can cache API responses, reducing load on your server and speeding things up.
+
+
+
+              [ Client / Browser ]
+                       ↓
+             ┌────────────────────┐
+             │     NGINX Server   │ ← handles HTTPS, reverse proxy, static files
+             └────────────────────┘
+                    ↓        ↓
+     ┌────────────────┐   ┌────────────────┐
+     │ Node.js App #1 │   │ Node.js App #2 │ ← handles APIs, DB, logic
+     └────────────────┘   └────────────────┘
+
+
+
+What NGINX Does (Recap)
+Task	NGINX does this
+Reverse proxy / routing	✅
+HTTPS/SSL termination	✅
+Load balancing	✅
+Static file serving	✅
+Caching	✅
+🔄 What Can Replace NGINX in AWS?
+Here are alternatives you can use instead of NGINX in AWS:
+
+AWS Service	Replaces NGINX Features
+Application Load Balancer (ALB)	Reverse proxy, routing, SSL, load balancing
+CloudFront (CDN)	Caching, SSL, edge delivery
+S3 + CloudFront	Static file hosting (HTML, CSS, JS, images)
+API Gateway	Secure API routing + rate limiting
+Elastic Beanstalk	Manages EC2 + load balancing (can include NGINX or not)
