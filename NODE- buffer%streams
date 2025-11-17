@@ -1,0 +1,69 @@
+This  File contains the notes of the Buffer and Streams :
+
+
+EX: when we need to send the 2Tb data to the server from the code , but we have the 8Gb RAm only 
+so it is not possibel to send the data to the  server with teh help of this 8GB ram. { pratically this can not be done
+
+But we have an options here in this case:
+------------------------------------------- >
+
+.> We have to split the file into the chunks and server should take the file in chunk and write into disk at the
+same time. For this we need to use the streams and buffer in Node.js
+
+STREAMS: 
+--------->
+.> Streams in node.js are a way to handle continuous flow of data.
+.> They enable reading or writing data piece by piece instead of loading teh entire daat into memory.
+.> 
+
+
+Buffers:
+--------->
+.> A buffer in node.js is a temporary storage area for binary data.
+.> Buffers work as chunks of data, enabling efficient data manipulation in streams.
+.> It helps to decrease memory consumption of ypur web server.
+
+.> There are four types of streams in Node.js: 
+Writable, readable, Duplex, and Tranform.
+
+sample code:
+import { createReadStream, createWriteStream } from "fs";
+import path from "path";
+
+const inputFilePath = path.join(import.meta.dirname,"input.txt");
+const outputFilePath = path.join(import.meta.dirname, "output.txt");
+
+// Reading the data in the chunk wise:
+syn : createReadStream( filePathName , {other options} )
+const readableStream = createReadStream(inputFilePath, {
+encoding: "utf-8",
+highWaterMark: 16,
+});
+
+// Writing the data to the file
+const writableStream = createWriteStream(outputFilePath);
+
+.pipe(): This is an built in method which is used to connect the reableStream with the 
+Writable Stream.
+readableStream.pipe(writableStream);
+
+
+
+// we can add the event listens:
+readableStream.on("data", (chunk) => {
+console.log("Buffer (chunk):", Buffer.from(chunk)); // Convert the chunk to a buffer 
+console.log("Received chunk:", chunk); // Loges each 16-byte chunk
+writableStream.write(chunk);  // Write each chunk to output file.
+
+// handle stream end:
+readableStream.on("end", () => {
+console.log("File read complted.");
+writableStream.end();
+})
+
+
+// Handling the errors:
+readableStream.on("error",(err) => console.error("Error",err));
+writableStream.on("error",(err) => console.error("Error", err));
+
+
