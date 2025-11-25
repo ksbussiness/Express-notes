@@ -1,0 +1,391 @@
+JSON: 
+
+It's a lightweight data interchange
+format that's easy to read and write for humans  and simple for machines to parse and generate.
+
+its the backbone of the JWTs because it represents its payload, which is where you store the data you want to transmit.
+
+JWT: the structure of the JWT IS:
+
+HEADER, PAYLOAD , SIGNATURE
+
+..> The header consists of the token type: JWT
+
+
+..> PAYLOAD: THE Payload of a JWT  is where you store the claims. 
+ 
+
+..> Signed JWTs provide authentication, Authorization, and secure information exchange,
+
+
+
+What is JWT (JSON Web Token)?
+
+JWT (JSON Web Token) is a token used to securely transmit information between parties
+
+ .> It is commonly used for authentication and authorization in web applications.
+
+
+Why is JWT Used?
+
+.> Authentication: JWT is often used to verify a user's identity after they've logged in        with their username and password.
+
+.> Instead of sending credentials with every request, a server sends a JWT to the client, which is then used for subsequent requests.
+
+.> With JWT, you don't need to check the database every time a user makes a request. The token carries all the necessary information for authentication and can be quickly verified.
+
+
+.> Stateless Authentication: Traditional session-based authentication requires the server to keep track of active sessions, which can be resource-intensive, especially for large-scale applications. JWT offloads this burden by keeping session data in the token itself.
+
+
+Before JWT (JSON Web Token) :
+===============================>
+..> For managing authentication in web applications was session-based authentication. 
+
+
+
+
+Session-Based Authentication :
+
+User Login:
+..> The user provides their username and password to log in.
+..> The server verifies the credentials against a database.
+
+Session Creation:
+..> If the credentials are correct, the server creates a session for the user.
+..> The session is stored on the server, usually in memory or a database, and contains information about the user, such as their user ID or roles.
+
+Session ID:
+..> The server generates a unique Session ID and sends it back to the user's browser as a cookie.
+..> The cookie is stored in the user's browser and is sent with each subsequent request to the server.
+
+Session Validation:
+..> For every request, the server checks the Session ID from the cookie to find the corresponding session data on the server.
+..> If the session is valid, the server processes the request; otherwise, it rejects it.
+
+
+
+
+
+WORKING FLOW OF THE JWT (JSON WEB TOKEN)
+
+
+
+
+
+1. User Registration
+Client Side:
+
+The user enters their details (e.g., username, email, password) on a registration form.
+The client (browser or app) sends this data to the server via a POST request.
+Server Side:
+
+The server receives the registration data and stores the user details (typically after hashing the password for security) in a database.
+The server responds with a success message indicating the user has been registered.
+2. User Login
+Client Side:
+
+The user enters their username and password in the login form.
+The client sends these credentials to the server via a POST request to the login endpoint.
+Server Side:
+
+The server verifies the credentials against the database.
+If the credentials are valid, the server generates a JWT containing the user's information (e.g., user ID, roles).
+The server sends the JWT back to the client.
+JWT Structure:
+
+Header: Specifies the token type (JWT) and the signing algorithm (e.g., HS256).
+Payload: Contains user-specific data (e.g., user ID, roles).
+Signature: A hash of the header, payload, and a secret key, ensuring the token hasn't been tampered with.
+3. Token Storage on the Client
+The client stores the received JWT in a safe place, usually in local storage or session storage (or sometimes in a cookie with HttpOnly and Secure flags).
+4. Performing Activities (POST, GET, GET by ID, DELETE)
+a. POST Request (Creating a New Resource)
+Client Side:
+
+The client sends a POST request to create a new resource (e.g., a new post).
+The JWT is included in the request header (Authorization: Bearer <token>).
+Server Side:
+
+The server extracts and verifies the JWT from the request header.
+If the token is valid, the server processes the request and creates the resource.
+The server responds with the created resource or a success message.
+b. GET Request (Fetching All Resources)
+Client Side:
+
+The client sends a GET request to retrieve all resources.
+The JWT is included in the request header.
+Server Side:
+
+The server verifies the JWT.
+If the token is valid, the server retrieves and returns the resources.
+c. GET by ID Request (Fetching a Specific Resource by ID)
+Client Side:
+
+The client sends a GET request with a specific resource ID to fetch that resource.
+The JWT is included in the request header.
+Server Side:
+
+The server verifies the JWT.
+If valid, the server retrieves the resource by ID and returns it to the client.
+d. DELETE Request (Deleting a Resource)
+Client Side:
+
+The client sends a DELETE request with the ID of the resource to be deleted.
+The JWT is included in the request header.
+Server Side:
+
+The server verifies the JWT.
+If valid, the server deletes the specified resource.
+The server responds with a success message or confirmation.
+5. Token Expiration and Refresh
+JWTs often have an expiration time (exp claim) to enhance security.
+When the token expires, the user must log in again or use a refresh token mechanism to obtain a new JWT.
+Summary of the Flow:
+Registration: User signs up, and details are stored.
+Login: User logs in, and a JWT is generated.
+Token Usage: The client uses the JWT for authentication in API requests (POST, GET, GET by ID, DELETE).
+Verification: The server verifies the JWT for each request and processes it if va
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.........................................................>>>.............................>>>.............................>>>.............................>>>.............................>>>.>>>
+
+/backend
+  server.js
+  /routes
+    auth.js
+
+/frontend
+  /src
+    App.js
+    /components
+      Register.js
+      Login.js
+      Welcome.js
+
+..........>>.......>>>>>>>>..........> 
+1. server.js
+
+
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const authRoutes = require('./routes/auth');
+
+const app = express();
+app.use(bodyParser.json());
+app.use(cors());
+
+mongoose.connect('mongodb://localhost:27017/simplejwt', { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.log(err));
+
+app.use('/auth', authRoutes);
+
+const PORT = 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+
+..........>>.......>>>>>>>>..........> 
+
+2. routes/auth.js
+
+
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const User = require('../models/User');
+const router = express.Router();
+
+const SECRET_KEY = 'your_secret_key';
+
+// Register
+router.post('/register', async (req, res) => {
+  const { name, email, password } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  try {
+    const user = new User({ name, email, password: hashedPassword });
+    await user.save();
+    res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Registration failed' });
+  }
+});
+
+// Login
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (user && await bcrypt.compare(password, user.password)) {
+      const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: '1h' });
+      res.json({ token });
+    } else {
+      res.status(401).json({ error: 'Invalid credentials' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Login failed' });
+  }
+});
+
+module.exports = router;
+
+
+
+
+..........>>.......>>>>>>>>..........> 
+..........>>.......>>>>>>>>..........> 
+
+3. models/User.js
+
+const mongoose = require('mongoose');
+
+const userSchema = new mongoose.Schema({
+  name: String,
+  email: { type: String, unique: true },
+  password: String,
+});
+
+module.exports = mongoose.model('User', userSchema);
+
+
+..........>>.......>>>>>>>>..........> 
+..........>>.......>>>>>>>>..........> 
+1. App.js
+
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Register from './components/Register';
+import Login from './components/Login';
+import Welcome from './components/Welcome';
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/welcome" element={<Welcome />} />
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
+
+
+..........>>.......>>>>>>>>..........> 
+..........>>.......>>>>>>>>..........> 
+
+2. Register.js
+
+
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const Register = () => {
+  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const response = await fetch('http://localhost:5000/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
+    if (response.ok) navigate('/login');
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input name="name" placeholder="Name" onChange={handleChange} required />
+      <input name="email" type="email" placeholder="Email" onChange={handleChange} required />
+      <input name="password" type="password" placeholder="Password" onChange={handleChange} required />
+      <button type="submit">Register</button>
+    </form>
+  );
+};
+
+export default Register;
+
+..........>>.......>>>>>>>>..........> 
+..........>>.......>>>>>>>>..........> 
+
+3. Login.js
+
+
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const Login = () => {
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const response = await fetch('http://localhost:5000/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
+    if (response.ok) {
+      const data = await response.json();
+      localStorage.setItem('token', data.token);
+      navigate('/welcome');
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input name="email" type="email" placeholder="Email" onChange={handleChange} required />
+      <input name="password" type="password" placeholder="Password" onChange={handleChange} required />
+      <button type="submit">Login</button>
+    </form>
+  );
+};
+
+export default Login;
+
+
+..........>>.......>>>>>>>>..........> 
+..........>>.......>>>>>>>>..........>
+
+4. Welcome.js
+
+
+import React from 'react';
+
+const Welcome = () => {
+  return <h1>Welcome to the Application!</h1>;
+};
+
+export default Welcome;
+
+
+
+
