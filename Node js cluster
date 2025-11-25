@@ -5,3 +5,107 @@ server, then the load on the NODE_SERVER will increased.
 .> 
 
 When more users are coming then we use the clusters.
+
+
+What is Cluster in Node.js?
+.> Node.js runs single-threaded JavaScript code on a single CPU core using the event loop.
+
+But modern servers have:
+✔ Multiple CPU cores
+✔ Multi-threaded environments
+
+To use all CPU cores, Node.js provides a built-in module called cluster.
+
+Cluster is a Node.js module that allows you to create child processes (workers) that share the same server port, enabling multi-core parallelism and improving performance.
+
+Why Cluster is Needed?
+.> Normally, Node runs on 1 CPU core only.
+.> If your machine has 8 cores → your Node server still uses only 1 core, remaining cores are idle.
+
+Cluster lets you:: 
+Create multiple workers (one worker per CPU core)
+Each worker runs your server code
+All workers share the same server port
+Node’s internal load balancer distributes incoming requests
+
+Cluster Architecture :- 
+            ┌───────────────────────┐
+            │     Master Process    │
+            │  (Cluster Manager)    │
+            └─────────┬─────────────┘
+     ┌─────────────────┼──────────────────┐
+     ▼                 ▼                  ▼
+ Worker 1         Worker 2           Worker 3   ... (n cores)
+(Server code)    (Server code)      (Server code)
+
+
+Is Cluster Used in Production? 
+.>YES – widely used in production.
+.> But usually through PM2, which internally uses Node cluster.
+
+
+cons of having the cluster:
+.> Master should auto-restart workers, if worker is crached.
+.> Workers do NOT share memory. Use Redis/mongo for shared state.
+
+IMP Points :
+----------------- >
+.> Each worker is a separate Node.js process, So memory is NOT shared.
+.>  Workers share the same port
+.> 
+
+
+.> we have an node server , when an application is running on an node server, and when more peopele connects to that 
+server, then the load on the NODE_SERVER will increased.
+.> 
+
+When more users are coming then we use the clusters.
+
+.> Clusteers of Node.js process can be used to run multiple instancs of Node.js servers 
+
+
+.> we have the main server , and to this main server we have the multiple small servers attached to it.
+.> when  people will come , ask for info to my main server , then main server will distribute teh request to the small
+server to full fill the request.
+.> Here we are distributing the workload to the multiple servers.
+.> 
+
+
+cosnt cluster = require("node:cluster");
+const  express = require("express");
+const os = require("os");
+
+
+const totalCPUs = os.cpus().length;
+
+console.log(totalCPUs ); // 
+
+if (cluster.isPrimary) {
+
+for( let i=0;i<totalCPUs ;i++ )  {
+    cluster.fork();
+}
+}
+ else {
+
+const app = express();
+const PORT = 8000;
+
+app.get("/", (req,res) => {
+ return res.json({message: "Hello from express server ${process.pid} });
+});
+
+app.listen(PORT, () => console.log(`Server Startet At PORT: ${PORT} ` ));
+
+}
+
+
+
+.> Here the algorith which is used is round robbin method.
+.> 
+node.js Cluster is a built-in module that allows Node to use all CPU cores by creating multiple worker processes that share the same server port. Each worker runs a copy
+of the server and handles incoming requests. The master process manages workers, restarts them if they crash, and distributes connections. Cluster improves performance, 
+throughput, and reliability. It is commonly used in production, usually with PM2, to achieve multi-core scaling and zero-downtime restarts. However, workers do not share memory,
+so shared state must be stored externally (Redis/DB). For CPU-intensive tasks, use worker_threads instead.
+
+
