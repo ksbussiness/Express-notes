@@ -1,0 +1,7 @@
+NODE js developer:
+
+.> we have an node server , when an application is running on an node server, and when more peopele connects to that 
+server, then the load on the NODE_SERVER will increased.
+.> 
+
+When more users are coming then we use the clusters.
