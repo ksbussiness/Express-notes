@@ -1,0 +1,323 @@
+
+
+node-js :
+==============>
+
+Sr. NodeJs Developer
+Konstant Infosolutions Pvt. Ltd.
+
+
+https://www.udemy.com/course/understanding-nodejs-core-concepts/?couponCode=NVDIN35
+
+
+https://www.udemy.com/course/nodejs-express-mongodb-bootcamp/?couponCode=NVDIN35
+
+
+
+..> 
+
+JAVASCRIPT
+
+Functions has first class citizens,
+
+proto type inheritance,
+
+functions
+fat array functions, 
+function declarations,
+
+avoide:
+concurrency
+event loop
+model of concurrency
+variable clorese
+for loop to list conversions
+dealing with the neasted loops
+loops to map, reduce functions
+
+string and arrays
+split and 
+and strings to array conversions
+splice, slice, filter, find'
+sorted array to merge conversion
+searching, 
+hashmap implementation
+json key pairs
+how hashmap used in the json key pairs.
+convert all to upper case, 
+convert all the words to lower case,
+reverse of every word in a sentence
+
+ palindrome,prime,fibo
+
+calling a function it self
+
+deletation of a string 
+
+captalize the a first letter
+
+remove the first letter in a letter,
+
+need to know the ES6 Full concepts need to come;
+
+
+array,
+objects,
+class
+function 
+
+OOPS IN javascripts
+object inheritance in javascript
+
+..>
+
+...> middlewares stages each stage performance, etc
+
+..> locks
+
+..> resource sharing concepts
+
+..> rest
+..> js
+
+..> IS ENTENSIVE APPLICATIONS
+..> REST API
+
+..>
+
+==========================================================================================================================================
+
+NodeJS Training Content :
+
+Introduction to Node.js
+.> RAM vs. I/O latency
+.> Blocking vs. Non-Blocking
+.> Event-driven Programming
+.> Event Loop
+.> Blocking The Event Loop
+.> Node.js Philosophy
+
+Node.js Platform Setup
+.> Download and Install
+.> Node REPL
+.> First Hello World
+
+Modules and npm
+.> Anatomy of a module
+.> Private code
+.> Accessing and using modules
+.> npm commands
+.> package.json
+
+The Callback Pattern
+.> What are callbacks
+.> Callback-last
+.> Error-first
+
+Events
+.> When to use Event Emitters
+.> Binding Functions to Events
+.> Event Requests and Listening
+
+
+Error Handling
+.> Callbacks: Error-first
+.> Errors in Event Emitters
+.> Uncaught Exceptions
+.> Using Domains
+
+
+Buffers
+.> Why Buffers exist
+.> Creating Buffers
+.> Reading and Writing Buffers
+.> Manipulating Buffers
+
+Streams
+.> What are streams
+.> Read and Write Stream API
+.> Flow Control
+.> Piping
+.> Duplex Stream
+.> Transform Stream
+
+
+Express.js
+.> Intro and Installing Express.js
+.> Building a Hello Express application
+.> Creating routes
+.> Rendering Layouts
+.> Using templates
+.> Adding partials
+.> Using locals and conditional templates
+.> Modularizing routes
+
+Socket.io
+.> Listening for
+.> Broadcasting
+.> Answering questions
+
+
+Connecting to Databases
+.> No SQL and Document Stores
+.> Relational DBs
+.> Configuration and platform setup
+.> CRUD Operations
+
+
+
+About Web services Security
+
+.> Introduction
+.> Need of security
+.> Types of securities
+.> Real time Examples with scenarios
+
+
+
++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++
+++++++++++++++++++++
+++++++++++++++++++++
+
+
+1) HOW BROWSER WORKS :
+2) HOW JAVASCRIPT WORKS :
+3) BASICS OF TERMINAL:
+a) CLI vs GUI
+b) shell vs Terminal
+c) Bash Shell
+d) Bashrc
+e) editor -nano,vim
+f) Basic commands (cd,ls,pwd,touch, mkdir, cat
+g) shebang
+
+4) BASICS OF OS :
+
+a) OS, KERNEL, PROCESS, THREAD
+b) Concurrency vs parallelism
+c) File System , path system, Environment variables
+d) file permissions
+e) basics of Linux (WSL)
+
+5) FUNDAMENTALS OF NODE.JS :
+
+a) module systems of node.js(commonjs ,ESM
+b) Module wrapper Functions
+c) NPM vs NPX (Node modules )
+d) packega.json vs package-lock.json
+e) CLI vs Library packges, locl, vs Global Packages
+f) fs module (Learn all file operations
+
+6) DATA Representatin In Computer:
+
+a) Number system
+b) Character sets character Encodings
+c) BOM & Endianness(little-endians & Big-Endian)
+
+7) Working with Binary Data in JS & NOde.js
+a) ArrayBuffer 
+b) DataView
+c) TypedArrays( Unit 8 Array, Uint16Array )
+d) Node.js Buffers
+
+8) Event-Driven Archtitecture $ Evnt Emitter class
+a) I/O Operation
+b) Async I/O
+c) EDA
+d) EventEmitter class
+
+9) Handling Large Data Transfers with streams:
+a) Readable & writable Streams
+b) Duplex & Transform Streams
+c) Handling Back pressure
+d) piping & pipeline
+e) Streams in browser
+
+10) Basic of networking Computer Networking 
+
+History of Internet & Networking
+Networking devices( Repeater, Hubs, Switches,
+Types, of Networks, (LAN,MAN,WAN
+
+How Internet Works ? how mobile Internet works
+IP Address (IPV4 & IPV6)
+Static vs Dynamic & private and public
+
+make your laptop a public server
+
+DNS and DNA servers
+
+port number, netwoks Interfaces, MAC Address
+
+Osi Model & TCP/IP Model
+
+network Topologies
+TCP & UDP Protocols
+
+SSH & SCP
+Get a EC2 instance on AWS and deploy a 
+
+
+
+++++++++++++++++++++
+++++++++++++++++++++
++++++
+
+Prerequisites
+
+Basic knowledge of JavaScript and web development concepts.
+Familiarity with HTML, CSS, and JavaScript is recommended.
+Introduction to Node.js
+
+Overview of Node.js and its role in server-side JavaScript development.
+Understanding the event-driven, non-blocking I/O model of Node.js.
+Introduction to NPM (Node Package Manager) and its significance in managing dependencies.
+Node.js Fundamentals
+
+Setting up the Node.js environment and runtime.
+Writing and executing basic Node.js scripts.
+Exploring modules and using them to organize code.
+Asynchronous Programming
+
+Understanding asynchronous programming concepts in Node.js.
+Using callbacks, Promises, and Async/Await for handling asynchronous operations.
+Managing multiple asynchronous tasks efficiently.
+Building HTTP Server
+
+Express.js - Building Web Applications
+
+Introduction to Express.js, a popular Node.js framework for building web applications.
+Setting up an Express.js application and creating routes.
+Using middleware for request processing and handling.
+Working with Databases
+
+Connecting to databases like MongoDB or MySQL using Node.js.
+Performing CRUD operations with databases using Node.js.
+Implementing data models and handling data retrieval and storage.
+RESTful APIs
+
+Designing and building RESTful APIs with Node.js and Express.js.
+Implementing API endpoints for data retrieval, creation, update, and deletion.
+Handling authentication and authorization in API development.
+Real-Time Communication
+
+Introduction to Socket.IO for real-time communication between clients and servers.
+Building real-time chat applications and live notification systems.
+Middleware and Error Handling
+
+Understanding middleware functions and their role in request processing.
+Implementing custom middleware for authentication, logging, and error handling.
+Security and Best Practices
+
+Best practices for secure Node.js development.
+Implementing security measures to prevent common vulnerabilities.
+Securing APIs and handling user authentication securely.
+Deploying Node.js Applications
+
+Deploying Node.js applications on various platforms and cloud services.
+Optimizing Node.js applications for performance and scalability.
+Project Work and Hands-on Exercises
+
+Building a real-world Node.js project from scratch.
+Hands-on exercises to reinforce the concepts learned throughout the course.
