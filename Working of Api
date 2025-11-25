@@ -1,0 +1,117 @@
+
+JSON JAVA SCRIPT OBJECT NOTATION:
+=====================================
+
+eXtensional market 
+
+..> In order to communicate with the websites which are developed by the different technologies we need a common language where both the websites can understand it.
+
+
+..> we have the JSON, XML, for communicating WITH the different websites.
+
+..> XML : Extension MarkUp Language. { Here data comes with the tags }
+
+..> <employee> 
+    XML
+
+</employee> 
+
+
+
+..> JSON : JAVA SCRIPT OBJECT NOTATION: { here data comes with the text }
+
+Json: The objects which are present in the javascript which we need to represent in the text is nothing but the JSON.
+.> Light weight data format- because it is a plain text.
+.>used to store & exchange data.
+.>Language independent
+.> can use with any programing language.
+.> 
+
+
+{
+one-object
+}
+
+in json we store by using the key=value.
+
+the value: may be { number,string,boolean,nested objects,arrays,null}
+
+
+============================================================================================================================================================================================================================================================================================================================================================================================================================================================
+
+
+API {Application programming interface } {here application means software.}
+
+..> API's are the mechanism that enables two softwares components to communicate with each other using a set of defined rules and protocols.
+
+..> So whenever an  software is develoed then that time APIs for that software is developed.so that the other software companies will use them.
+
+..> Private Api 
+
+=These are internal to an enterprise and only used for connecting systems and data within the organization only . 
+
+.> public Api :
+= Thses are open to the public and may be used by anyone.
+
+.> Partner APIs :
+= Thses are only accessible by authorized external develpoers to aid business-to-business-partnership.
+
+.> Composite APIs:
+= these combine two or more different APIs to address complex systems requirements or behaviors.
+
+
+
+==============================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
+
+
+
+SOAP APis: Simple object access Protocol:
+
+.> SOAP is an standard protocol, developed by the Microsoft. The api which developed by the SOAP protocol is called the SOAP API.
+
+..> Security, acid properties,  Only uses the XML data for communication.
+
+..>Implementation process is complex
+
+
+RCP APis: Remote Procedure Call:
+
+
+REST_API: 
+
+..> Representational State Transfer: here this is not a protocol but it is an architectural pattern.
+
+..> REST is used for clients and servers to exchange data using HTTP.
+
+..> REST defines a set of functions like GET, PUT, POST, DELETE to access the server data.
+
+
+
+
+..> This is an resource oriented API.
+
+..> At the time point when we asking the data, we get the data from the data base 
+here converting data's state in Database into representational form(json/xml) and transfers as responce from the server to client.
+
+..>after we made the request to server{ database} tranfering the data state of the DATA which is present in the database in to the requested representation like JSON /XML is called the REPRESENTATION STATE TRANSFER.
+
+..> rest follows some contraints:
+client-server
+stateless
+cache
+uniform interface
+layered system
+code on demand
+
+
+
+WEB-SOCKET API:{ MORE MODERN API in future }
+
+=============================================================================================================================================================================================================================
+===============================
+
+PART-2
+
+
+
+
