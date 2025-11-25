@@ -1,0 +1,353 @@
+
+
+// let express=require('express')
+// let app=express()
+// app.get("/search/:hno/:dob",(req,res)=>{
+
+//     console.log(req.params.hno)
+//     console.log(req.params.dob)
+
+//     res.send("data received")
+//     res.send("hey i got the datA")
+
+// })
+
+// app.listen(6565)
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+// let express=require('express')
+// let app=express()
+// app.delete("/search/:hno/:dob",(req,res)=>{
+
+//     console.log(req.params.hno)
+//     console.log(req.params.dob)
+
+//     res.send("data deleted succefully")
+// })
+
+// app.listen(6565,()=>{
+//     console.log("server is running on port 6565")
+// })
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// sending data   that has part of the Body , you should not use them in the URL path but instead access them directly from req.body.
+
+
+// let express=require('express');
+// let app=express();
+// app.use(express.json())
+// app.post("/search",(req,res)=>{
+//     const {hno,dob}=req.body; // Get hno and dob from the body
+//     console.log(hno,"gap",dob)
+//     res.send("data received in the  POST MAN")
+// })
+// app.listen(6565,()=>{
+//     console.log("hey server port number running on 6565")
+// })
+
+
+// postman configuration:
+
+// method:post,
+// url: http://localhost:6565/search ,
+
+// body:(raw,JSON)
+// {
+//     "hno": "31-23",
+//     "dob": "1999-19-12"
+//   }
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// let express = require('express')
+
+
+// let app = express();
+
+// app.post("/search/:hno/:dob", (req, res) => {
+
+//     const { hno, dob } = req.params; // Get hno and dob from the URL parameters
+//     console.log(hno, dob);
+//     res.send("hey ,sachin ,data received in the POST MAN..!")
+// })
+
+// app.listen(6565, () => {
+//     console.log("SErver in the POST MAN 6565665656")
+// })
+
+
+// // postman configuration:
+
+// // method:post,
+
+// // URL:http://localhost:6565/search/23/2001-90-90
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+// UPDATE METHOD USING THE PUT  USING BODY:
+
+// let express=require('express');
+// let app=express();
+// app.use(express.json())
+
+// let data={hno:"11-22",dob:"1999-19-19"};
+
+// app.put("/search",(req,res)=>{
+//     const {hno,dob}=req.body;
+//     if(hno&&dob){
+//         data.hno=hno;
+//         data.dob=dob;
+//         console.log("updated data is",data);
+//         res.send('Data updated succefully in the body hey!...');
+
+//     }
+//     else{
+//         res.status(400).send("Missing hno oe dob in request body")
+//     }
+// });
+
+// app.listen(6565,()=>{
+//     console.log("Server is running on port 6565")
+// })
+
+// post man configuration:L
+// method:PUT,
+// URL:http://localhost:6565/search
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+// UPDATE METHOD USING THE PUT  USING URL:
+
+// let express=require('express')
+
+// let app=express();
+// app.use(express.json());
+
+// let data={hno:"33-44",dob:"2000-20-20"}
+
+// app.put("/search/:hno/:dob",(req,res)=>{
+
+//     const {hno,dob}=req.params;
+//     if(hno&&dob){
+//         data.hno=hno;
+//         data.dob=dob;
+//         console.log("updated data here is:",data)
+//         res.send("data updated successfully");
+//     }
+//     else{
+//         res.status(400).send("missing hno or dob in URL ")
+//     }
+// })
+
+// app.listen(6565,()=>{
+//     console.log("SErver is running on the port nUmber 6565")
+
+// })
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// You're sending data in the body of the POST request, but Express by default does not parse JSON or form data. You need to use express.json() middleware to parse the incoming JSON data before accessing req.body.
+
+
+// database connection
+
+// performing all the CURD Operations
+
+//
+
+// let express = require('express');
+// const res = require('express/lib/response');
+
+// let app = express()
+
+// //const { append } = require('express/lib/response');
+
+// let mongoose = require('mongoose');
+// app.use(express.json());
+
+// let schobj = new mongoose.Schema({
+//     "_id": String,
+//     "name": String,
+//     "age": Number
+// })
+
+
+// let user = mongoose.model("user", schobj)
+
+// mongoose.connect("mongodb://127.0.0.1:27017/qodic").then((c) => {
+//     console.log("ok, iam here ")
+// })
+
+// app.listen(6565, () => {
+//     console.log(" hey , hai , iam sachin iam running on the server 6565")
+// })
+
+
+// app.post("/insert", (req, res) => {
+//     let data = new user(req.body)
+//     data.save().then(() => {
+//         res.send("data stored..!")
+//     }).catch((err) => {
+//         res.send
+//     })
+// })
+
+
+// app.get("/get", (req, res) => {
+//     user.find({}, { "name": 1 }).then((data) => {
+//         res.json(data)
+//         console.log(data)
+//     }).catch((err) => {
+//         res.send(err)
+//     })
+// })
+
+
+// app.put("/updating", (req, res) => {
+//     const { name } = req.body;
+
+//     user.updateOne({}, { $set: { "name": name } }).then((data) => {
+//         res.json(data)
+//         console.log(data)
+
+
+//     }).catch((err) => {
+//         res.send(err)
+//     })
+// })
+
+
+// app.delete("/deleting", (req, res) => {
+//     user.deleteOne({ "_id": "04" }).then((data) => {
+//         res.json(data)
+//         console.log(data)
+//     }).catch((err) => {
+//         res.send(err)
+//     })
+// })
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// server creation using the nodejs
+
+// var http = require('http');
+// var url = require('url')
+
+// http.createServer(function (req, res) {
+
+//     res.writeHead(200, { 'Context-Type': 'text/html' });
+//     var q = url.parse(req.url, true).query;
+//     var data = q.year + " " + q.month;
+//     res.end(data);
+//     console.log(data)
+
+// }).listen(6565);
+
+//http://localhost:6565/?year=2017&month=July
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// File system in the nodejs :
+
+
+// READING THE CONTENT
+// var d=require('fs');
+
+// const data=d.readFileSync('./demo.txt','utf8')
+// console.log(data)
+
+//////////////////////////////////////////////////////////////
+// WRITING THE CONTENT
+
+
+// var d=require('fs');
+// try{
+
+//     d.writeFileSync('./demo.txt',"this is second line to add");
+//     console.log("file written  successfully...!")
+
+// }
+// catch (err){
+//     console.log(err)
+// }
+
+// here fs.writeFileSync overwrites the file's content by default, instead of appending to it. This means that the existing content in demo.txt is replaced by the new content "this is second line to add".
+
+
+//////////////////////////////////////////////////////////////
+// APPENDING THE CONTENT:
+
+// var d=require('fs')
+
+// try{
+
+//     var data=d.appendFileSync('./demo.txt',"iam sachin hre and iam appending the data")
+//     console.log("file appending successfully")
+//     console.log(data)
+
+// }
+
+// catch(err){
+//     console.log(err)
+
+// }
+
+//but like fs.writeFileSync, it does not return any value upon success. This is why you're getting undefined when logging the data variable.
+
+//////////////////////////////////////////////////////////////
+// RENAMING THE FILE IN NOdejs
+
+// var d=require('fs');
+
+// try{
+//    const data= d.renameSync('demo.txt','demo123.txt')
+//     console.log("file renamed successfully")
+// }
+// catch(err){
+//     console.log(err)
+// }
+
+
+//////////////////////////////////////////////////////////////
+
+// DELETING THE FILE IN NODE-JS
+
+// var d=require('fs')
+// try{
+
+//     d.unlinkSync('sachin.txt')
+//     console.log('file delete  successfully..!')
+
+// }
+// catch(err){
+//     console.log(err)
+
+// }
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+var a = 90;
+
+var b = "90";
+
+console.log(a//b)
