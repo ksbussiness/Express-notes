@@ -1,0 +1,251 @@
+Node js Buffers :
+-------------------- >
+
+What is teh Bufferes:
+
+> A buffers is a temporary storage area for binary data.
+> It's mainly used for dealing with file systems,  network connections, or any data streams,
+> Bufferes allow manipulation of raw, binary data without requiring any transformation to text, like strings.
+
+> JavaScript normally works with:
+Strings
+Numbers
+Objects
+
+> But Node.js deals with:
+Files
+Network data (TCP, HTTP, WebSocket)
+Images
+Streams
+Encryption
+All of these are binary data, not plain strings.
+So Node.js uses Buffer to handle binary data.
+
+Why Buffer is Needed? :
+---------------------------------- >
+Buffers are created because for :
+File System Operations
+
+const fs = require("fs");
+
+fs.readFile("file.txt", (err, data) => {
+  console.log(data);        // Buffer
+  console.log(data.toString()); // Converted to string
+});
+
+> The data is a Buffer, not a string.
+
+
+Important Buffer Methods :
+--------------------------------------- >
+# 1. Buffer.from()
+Purpose:
+Create a buffer from existing data.
+const buf = Buffer.from("Hello", "utf8");
+console.log(buf); // <Buffer 48 65 6c 6c 6f>
+
+Explanation:
+"Hello" → UTF-8 bytes
+Stored in buffer memory
+
+
+B) From Array
+const buf = Buffer.from([72, 101, 108, 108, 111]);
+console.log(buf.toString());  // Hello
+
+ C) From Another Buffer (Copy)
+const buf1 = Buffer.from("Hello");
+const buf2 = Buffer.from(buf1);
+
+console.log(buf2.toString());
+
+# 2. Buffer.alloc() 
+Create a new buffer with fixed size.
+const buf = Buffer.alloc(5);
+console.log(buf);  // <Buffer 00 00 00 00 00>
+
+Explanation:
+Allocates 5 bytes
+All values initialized to 0 (safe)
+
+ A) Writing into allocated buffer :
+const buf = Buffer.alloc(5);
+
+buf.write("Hi");
+
+console.log(buf);
+console.log(buf.toString());
+
+B) 
+const buf = Buffer.alloc(10);
+
+buf.write("Node");
+
+console.log(buf);
+console.log(buf.toString());
+
+Reading Data from Buffer:
+const buf = Buffer.from("Hello");
+
+console.log(buf.toString("utf8"));
+console.log(buf.toString("base64"));
+console.log(buf.toString("hex"));
+
+\ot:Hello
+SGVsbG8=
+48656c6c6f
+
+# 3) Buffer Length :
+
+const buf = Buffer.from("Hello");
+console.log(buf.length);  //5  Each English character = 1 byte
+
+
+# 4) Access Individual Byte :
+const buf = Buffer.from("ABC");
+console.log(buf[0]);  // 65
+console.log(buf[1]);  // 66
+You can also modify:
+buf[0] = 97;
+console.log(buf.toString());  // aBC
+
+
+# 5) Concatenate Buffers :
+
+const buf1 = Buffer.from("Hello ");
+const buf2 = Buffer.from("World");
+
+const result = Buffer.concat([buf1, buf2]);
+
+console.log(result.toString());
+
+# 6) Compare Buffers
+
+const buf1 = Buffer.from("ABC");
+const buf2 = Buffer.from("ABC");
+
+console.log(buf1.equals(buf2));  // true
+
+# 7)  Slice Buffer :
+
+const buf = Buffer.from("Hello World");
+
+const sliced = buf.slice(0, 5);
+
+console.log(sliced.toString());  // Hello
+
+
+# 8) JSON Representation :
+
+const buf = Buffer.from("Hello");
+console.log(buf.toJSON());  // { type: 'Buffer', data: [72, 101, 108, 108, 111] }
+
+
+z# 9)  Example 2: Reading Binary File
+const fs = require("fs");
+
+const data = fs.readFileSync("image.png");
+console.log(data); // Buffer
+
+# 10) : Networking
+When data comes from socket:
+socket.on("data", (chunk) => {
+  console.log(chunk); // Buffer
+});
+
+
+
+
+Why use the buffers ?
+
+> binary data handling
+> Streams
+> Efficient Memory Use
+> Performance
+> Low-Level Control
+> Encoding Support
+
+
+
+
+Common Usecases :
+----------------------------- >
+> File Handling
+> Streams
+> Data Encoding/Decoding
+> Image/Video Processing
+> Cryptography
+> Compression
+> Networking
+
+
+const buffer1 = Buffer.alloc(10);
+
+const bufferFromArray = Buffer.from( [65,66,67 ] );
+
+const bufferFromString = Buffer.from('Hello, World ', 'utf-8') ;
+
+
+buffer1.write('Hello');
+console.log(buffer1) // 
+console.log( bufferFromArray )  // <buffer 12 13 14 >
+console.log(bufferFromString  )  // <buffer 46 47 48 49 90 88 >
+
+
+
+
+
+
+UTF- Base64 UnderStaning Properly here in this case:
+------------------------------------------------------------------- >
+
+
+Notes Points:
+--------------------- >
+What is the UTF-8 ?
+> UTF-8 is a way to store text as bytes.
+> Coputer do not under stand Characters like A, B etc, They only understand binary ( 0's and 1's ).
+
+
+NoteMain Point:
+---------------------- >
+Node js stores stings internally in UTF-8.
+
+const str='Hello';
+const Buffer = Buffer.from(str,"utf8')
+console.log(buffer)  //  <Buffer 48 65 6c 6c 6f>
+
+
+What is the Base64 ?
+
+Base64 is a way to convert binary data into readable text format.
+Binary data -> Base64 string
+
+
+| UTF-8                      | Base64                     |
+| -------------------------- | -------------------------- |
+| Encoding for characters    | Encoding for binary data   |
+| Converts text → bytes      | Converts bytes → text      |
+| Used internally in strings | Used for safe transmission |
+| Standard text encoding     | Not a character encoding   |
+
+Ex:  Convert string → Base64
+
+const str ="Hello";
+const base64 = Buffer.from(str,"utf8").toString("base64");
+console.log(base64);   //  SGVsbG8=
+
+
+EX: Base64 -> String
+const  base64= "SGVsbG8=";
+
+const original= Buffer.from(base64, "base64").toString("utf8");
+console.log(original);  // Hello
+
+
+### 
+UTF-8 → Converts characters to bytes.
+Base64 → Converts bytes to safe text format.
+Node.js uses Buffer for both conversions.
+
+
