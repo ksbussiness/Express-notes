@@ -1,0 +1,104 @@
+PM2 = a production-grade Node.js process manager
+
+.> Think of PM2 as a supervisor + orchestrator for Node processes.
+
+Why PM2 exists (the real problem it solves)
+
+Node.js is:
+Single-threaded
+Crashes kill the entire process
+No built-in restart logic
+No log rotation
+No daemon mode
+No CPU core utilization by default.
+
+
+WithOut PM2:
+-------------- >
+node app.js
+↓
+Crash ❌
+↓
+App is dead
+
+
+
+With PM2:
+-------------- >
+PM2 Daemon
+ └── node app.js
+      ↓
+     Crash ❌
+      ↓
+PM2 restarts automatically 
+
+Note: PM2 never touches your business logic.
+
+
+
+PM2 has two fundamentally different execution modes:
+----------------------------------------------------- >
+> # Fork Mode (default)
+pm2 start app.js
+
+What happens :-
+  PM2 starts one Node process
+  One event loop
+  One CPU core
+
+PM2
+ └── node app.js (PID 1234)
+
+When to use fork mode :-
+ Small apps
+ Background workers
+ Cron jobs
+ Low traffic APIs
+ Local development
+
+# Cluster Mode (this is where your question is)
+pm2 start app.js -i max
+
+
+or
+
+pm2 start ecosystem.config.js
+
+
+PM2 does NOT invent clustering.
+
+👉 PM2 uses Node.js cluster module internally.
+
+
+
+	d
+PM-2 COMMANDS: 
+------------------------------------------------------------- >
+
+
+pm2 delete <app_name_or_id>
+
+pm2 stop my-app
+pm2 stop all
+
+pm2 restart my-app
+pm2 restart all
+
+pm2 monit
+pm2 list
+pm2 show <app_name_or_id>
+
+
+pm2 logs <app_name_or_id>
+pm2 logs
+
+
+
+pm2 flush  : delete all the log files
+pm2 save   : Save the current process list so that PM2 can resurrect them on reboot.
+pm2 ecosystem : Generate an ecosystem file (for managing multiple applications).
+
+
+pm2 status : Displays detailed information about all running processes.
+pm2 update :pm2 updates for the latest version.
+pm2 --help 
