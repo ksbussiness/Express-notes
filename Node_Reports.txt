@@ -1,0 +1,56 @@
+Diagnostic report : 
+
+ # Report needed:
+.> The report is intended/made for development, test, and production use, to capture and preserve information for problem determination.
+.> It includes JavaScript and native stack traces, heap statistics, platform information, resource usage etc. 
+.> With the report option enabled, diagnostic reports can be triggered on unhandled exceptions, fatal errors and user signals, in addition to triggering programmatically through API calls.
+
+When something bad happens, Node dumps a diagnostic report (JSON) with:
+	JS + native stack traces
+	Heap + memory stats
+	Event loop state
+	Open handles, libuv info
+	Environment & system details
+
+
+In order to implement this, we need to use diff flags for diff purposes:
+
+# --report-uncaught-exception
+> Generates a report when your app crashes due to an uncaught exception.
+
+# --report-on-fatalerror
+> Generates a report on fatal Node.js runtime errors, like:
+Out of memory
+V8 internal failure
+Native crashes
+These are the nastiest bugs—this flag is gold for production debugging.
+
+# --report-on-signal
+> Lets you trigger a report manually using an OS signal.
+Default signal: SIGUSR2
+
+NOTE : Change the signal if SIGUSR2 is already used:
+    EX: node --report-on-signal --report-signal=SIGTERM app.js
+
+# --report-directory
+> Where reports are written
+--report-directory=./reports
+
+
+Note : Signal based report generation is not supported in Windows.
+--report-uncaught-exception
+--report-on-fatalerror
+
+
+
+
+We need to wait for any crash. The reports can be generated from the API call to test.
+ # use this: process.report.writeReport('./debug-report.json');
+  Great for:
+     Debug endpoints
+     Health checks
+  Before graceful shutdowns
+
+
+
+
