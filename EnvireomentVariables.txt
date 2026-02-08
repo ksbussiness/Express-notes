@@ -1,0 +1,166 @@
+Environment Variables :
+.> Environment variables are variables associated to the environment the Node.js process runs in.
+.> .env files (also known as dotenv files) are files that define environment variables, which Node.js applications can then interact with
+
+.> A .env file is a file that contains key-value pairs, each pair is represented by a variable name followed by the equal sign (=) followed by a variable value.
+
+NOte : The name of such files is usually .env or it starts with .env (like for example .env.dev where dev indicates a specific target environment). This is the recommended naming scheme but it is not mandatory and dotenv files can have any arbitrary file name.
+
+
+.env is just a configuration file
+When Node.js starts, tools like dotenv load those values into:
+..> After that, your Node process reads them as environment variables.
+
+When we say environment, we usually mean things like:
+ Where the app is running
+      > local development
+      > staging
+      > production
+
+How the app should behave
+    > which database to connect to
+    > which port to listen on
+    > whether debugging is enabled
+
+
+
+Think of dotenv as a translator between a text file (.env) and Node’s environment (process.env).
+
+Step 1: Node starts your app and Node already has an object called: process.env
+This object contains OS-level environment variables (like PATH, HOME, etc.).
+
+Step 2: You call dotenv.config() :
+import dotenv from "dotenv";
+dotenv.config();
+
+Find the .env file :
+-------------------------- >
+
+Looks in the current working directory
+Defaults to .env
+
+Note : We can override this one here in this case:
+dotenv.config({ path: ".env.production" });
+
+
+lets say we have this :
+.env file :
+-------------- > 
+PORT=3000
+DB_URL=mongodb://localhost:27017/app
+DEBUG=true
+
+dotenv reads this file using Node’s filesystem (fs). and makes everything has string. 
+
+
+Note : dotenv does NOT care about the filename, By default, it only looks for .env but, You can use any filename, but you must tell dotenv explicitly
+like this : dotenv.config({ path: ".environmentVariable" });
+
+
+
+Some conditions to keep in the mind for the Environment Variables:
+---------------------------------------------------------------------------- >
+
+
+Variable Names#
+.> A valid variable name must contain only letters (uppercase or lowercase), digits and underscores (_) and it can't begin with a digit.
+
+MY_SIMPLE_VAR = a simple single line variable
+MY_EQUALS_VAR = "this variable contains an = sign!"
+MY_HASH_VAR = 'this variable contains a # symbol!'
+MY_MULTILINE_VAR = '
+this is a multiline variable containing
+two separate lines\nSorry, I meant three lines'
+
+
+Comments#
+Hash-tag (#) characters denote the beginning of a comment, meaning that the rest of the line will be completely ignored
+
+export prefixes#
+The export keyword can optionally be added in front of variable declarations, such keyword will be completely ignored by all processing done on the file.
+
+
+ex: export MY_VAR = my variable
+
+
+
+
+----------------------------------  >
+cluster allows you to:
+
+Run multiple Node processes where Each process = Worker and All workers share the same server port.
+
+
+Primary process vs Worker process :
+
+Primary (manager) :
+-------------------------- >
+Starts first
+Creates workers
+Monitors workers
+Restarts workers if they die
+Does NOT handle requests.
+
+Worker (employee) :
+-------------------------- > 
+Does the real work
+Handles HTTP requests
+Runs your app code
+
+
+if (cluster.isPrimary) {
+  // manager logic
+} else {
+  // worker logic
+}
+
+
+What is class Worker? :  It is an object that represents the JS worker process.
+> It contains the workerID, Status, Events, Methods
+From where we get this info :
+	 In primary, cluster.workers[workerId] 
+	 In secondary, cluster.worker
+> Worker lifecycle  :
+    Worker life looks like this :
+	forked → online → listening → running
+	   ↓
+	disconnect → exit → dead
+
+
+There are different worker events :
+---------------------------------------- >
+
+
+disconnect :
+
+IPC (communication channel) is closed
+
+Happens when:
+worker.disconnect()
+worker killed
+worker exits
+
+worker.on('disconnect', () => {
+  console.log('Worker disconnected');
+});
+
+
+worker.on('exit', (code, signal) => {
+  console.log('Worker died');
+});
+
+
+Cluster level events:
+------------------------------- >
+> cluster.on('fork'): By this method the worker will be created.
+EX: cluster.on('fork', worker => {});
+
+> cluster.on('online') : This tells that Worker started running.
+
+> cluster.on('listening'): This tells that Worker server started listening.
+
+> cluster.on('message') : This tells that message from any worker.
+
+> cluster.on('disconnect'): This tells that worker is disconnected.
+
+> cluster.on('exit') : Worker died
