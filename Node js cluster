@@ -109,3 +109,184 @@ throughput, and reliability. It is commonly used in production, usually with PM2
 so shared state must be stored externally (Redis/DB). For CPU-intensive tasks, use worker_threads instead.
 
 
+PART -2:
+------------ >
+.> Clusters of Node.js processes can be used to run multiple instances of Node.js that can distribute workloads among their application threads. 
+.> The cluster module allows easy creation of child processes that all share server ports.
+
+
+import cluster from 'node:cluster';
+import http from 'node:http';
+import { availableParallelism } from 'node:os';
+import process from 'node:process';
+
+const numCPUs = availableParallelism();
+
+if (cluster.isPrimary) {
+  console.log(`Primary ${process.pid} is running`);
+
+  // Fork workers.
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(`worker ${worker.process.pid} died`);
+  });
+} else {
+  // Workers can share any TCP connection
+  // In this case it is an HTTP server
+  http.createServer((req, res) => {
+    res.writeHead(200);
+    res.end('hello world\n');
+  }).listen(8000);
+
+  console.log(`Worker ${process.pid} started`);
+}
+
+
+How it works:
+--------------- >
+
+.> The cluster module supports two methods of distributing incoming connections.
+.> The first one (and the default one on all platforms except Windows) is the round-robin approach, where the primary process listens on a port, accepts new connections and distributes them across the workers in a round-robin fashion, with some built-in smarts to avoid overloading a worker process.
+.> The second approach is where the primary process creates the listen socket and sends it to interested workers. The workers then accept incoming connections directly.
+
+
+Two ways a clustered server can accept connections
+# First, some background
+	When you use Node.js cluster, you have:
+	Primary (master) process – the main controller
+	Worker processes – child processes that handle requests
+# Second approach (the one being explained)
+	The primary process creates the listening socket and shares it with workers
+	The main process opens the server port
+	It then gives that open socket to workers
+	Workers directly accept client connections
+
+
+Why server.listen() behaves differently in cluster mode
+
+# In cluster mode:
+    Workers are NOT allowed to open network ports on their own.
+Only the PRIMARY process is trusted to:
+Open ports
+Own listening sockets
+Workers usually must ask the primary to do it for them.
+
+# Normal Node.js (NO cluster) :
+There is only one process
+	When you call server.listen(...)
+ THIS SAME process opens the port or socket
+No middleman.
+
+# Cluster mode :
+There is a primary
+There are workers
+Workers usually do NOT open sockets themselves
+So when a worker calls: server.listen(...) then “Hey primary, please open this for me” this is what happens internally.
+
+
+Because the primary process controls listening, workers don’t behave exactly like a normal Node.js process.
+@ There are 3 special cases : 
+
+
+Case 1: server.listen({ fd: 7 }) :
+
+What is a file descriptor?
+Think of a file descriptor (fd) like:
+
+A number tag for an open resource
+(file, socket, pipe, etc.)
+Example:
+fd 3 → a file
+fd 4 → another socket
+fd 7 → a network socket
+
+Meaning:
+“Use MY file descriptor number 7
+(inside THIS process)”
+
+You are in a worker and you say: server.listen({ fd: 7 })
+“Use my worker’s fd 7” Then Worker sends message to primary: like this “Please listen on fd 7”
+
+Primary says:
+“Okay, I’ll use MY fd 7”
+Primary opens/listens on ITS fd 7
+Primary hands that socket to the worker
+
+RESULT : 
+The worker’s fd 7 is ignored
+The primary’s fd 7 is used instead
+
+
+A file descriptor (fd) is:
+A number the operating system assigns automatically
+when something is opened (file, socket, pipe)
+
+Example inside a process:
+fd 0 → stdin
+fd 1 → stdout
+fd 2 → stderr
+fd 3 → socket opened by OS
+fd 4 → file
+fd 5 → another socket
+
+
+
+
+Case 2: server.listen(handle) :
+.> A handle is: A real, already-open socket
+.> You are saying:
+
+“Here is the socket.
+It is already open.
+Just use THIS.”
+
+So Node says:
+✔ “Okay — no need to ask the primary”
+
+# Result:
+Worker uses the socket directly
+Primary is not involved
+
+Case 3: 
+
+.> server.listen(0) Normally, this will cause servers to listen on a random port. However, in a cluster, each worker will receive the same "random" port each time they do listen(0). In essence, the port is random the first time, but predictable thereafter. To listen on a unique port, generate a port number based on the cluster worker ID.
+
+server.listen(port)	Primary
+server.listen({ fd })	Primary
+server.listen(handle)	Worker itself
+
+
+
+
+Imp Methods: 
+------------------ >
+
+.> cluster.isPrimary : True if the process is a primary. 
+.> cluster.isWorker  : True if the process is not a primary.
+
+Worke Imp Methods:
+--------------------
+.> worker.id [ Integer ] :
+# Each new worker is given its own unique id, this id is stored in the id.
+  While a worker is alive, this is the key that indexes it in cluster.workers.
+
+.> worker.isConnected [ Boolean ] :
+# This function returns true if the worker is connected to its primary via its IPC channel, false otherwise. 
+
+.> worker.isDead()  [ Boolean ]:
+# This function returns true if the worker's process has terminated
+
+.>  worker.kill();
+#  This will immediately kills the process.
+
+
+
+Class: Worker :
+------------------ >
+.> A Worker object contains all public information and method about a worker. In the primary it can be obtained using cluster.workers. In a worker it can be obtained using cluster.worker.
+.> 
+
+
