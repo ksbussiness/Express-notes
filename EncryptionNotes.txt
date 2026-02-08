@@ -1,0 +1,530 @@
+Frontend:
+  AES_KEY (random)
+    ↓ encrypt with RSA public key
+  encryptedKey
+    ↓ send to backend
+
+Backend:
+  encryptedKey
+    ↓ decrypt with RSA private key
+  AES_KEY
+    ↓ decrypt encryptedData
+  Plaintext
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+======================================================================== >
+======================================================================================>
+This is the code used :
+--------------------------- >
+
+import CryptoJS from "crypto-js";
+
+export function encryptData(data: Object, uuid: string) {
+  if (process.env.ENCRYPT_RESPONSE_ENABLED === "FALSE") {
+    return data;
+  }
+
+  const key = CryptoJS.SHA256(uuid);
+  const json = JSON.stringify(data);
+
+  const iv = CryptoJS.lib.WordArray.random(16); // 16 bytes for CBC
+
+  const encrypted = CryptoJS.AES.encrypt(json, key, {
+    iv,
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  });
+
+  return {
+    x: iv.toString(CryptoJS.enc.Hex),
+    y: encrypted.ciphertext.toString(CryptoJS.enc.Hex),
+  };
+}
+
+export function decryptData(
+  encryptedData: { x: string; y: string },
+  uuid: string,
+) {
+  if (process.env.DECRYPT_REQUEST_ENABLED === "FALSE") {
+    return encryptedData;
+  }
+
+  const key = CryptoJS.SHA256(uuid);
+  const iv = CryptoJS.enc.Hex.parse(encryptedData.x);
+  const ciphertext = CryptoJS.enc.Hex.parse(encryptedData.y);
+
+  const decrypted = CryptoJS.AES.decrypt({ ciphertext } as any, key, {
+    iv,
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  });
+
+  const string = decrypted.toString(CryptoJS.enc.Utf8);
+  const json = JSON.parse(string);
+
+  return json;
+}
+
+
+
+
+
+About CryptoJS Library
+CryptoJS is a JavaScript library that provides cryptographic algorithms. It's widely used for:
+
+Encryption/Decryption (AES, DES, Triple DES, Rabbit, RC4)
+Hashing (SHA-256, SHA-1, MD5, etc.)
+HMAC (Hash-based Message Authentication Code)
+Base64, Hex encoding/decoding
+In your case, it's used for AES encryption with SHA-256 hashing.
+
+
+
+
+Line-by-Line Breakdown
+1. Key Derivation
+const key = CryptoJS.SHA256(uuid);
+
+What it does:
+----------------- >
+Takes the user's UUID (unique identifier)
+Hashes it using SHA-256 algorithm
+Produces a 256-bit (32-byte) key
+
+Why SHA-256?
+----------------- >
+Converts any length UUID into a fixed 256-bit key
+One-way function (can't reverse to get UUID back)
+Deterministic (same UUID always produces same key)
+Each user gets a unique encryption key based on their UUID
+
+
+
+2. Data Preparation
+const json = JSON.stringify(data);
+
+What it does:
+----------------- >
+Converts JavaScript object to JSON string
+AES can only encrypt strings/bytes, not objects
+
+
+
+3. Initialization Vector (IV)
+const iv = CryptoJS.lib.WordArray.random(16); // 16 bytes for CBC
+What it does:
+
+Generates a random 16-byte (128-bit) IV
+IV is used to randomize the encryption
+Why IV is Critical:
+
+Without IV: Same plaintext + same key = same ciphertext (predictable, insecure)
+With IV: Same plaintext + same key + different IV = different ciphertext (secure)
+
+
+
+
+Why 16 bytes?
+------------------ >
+AES block size is 128 bits (16 bytes)
+CBC mode requires IV to be same size as block size
+
+4. AES Encryption :
+-------------------- >
+
+const encrypted = CryptoJS.AES.encrypt(json, key, {
+  iv,
+  mode: CryptoJS.mode.CBC,
+  padding: CryptoJS.pad.Pkcs7,
+});
+Let me break down each parameter:
+
+AES (Advanced Encryption Standard)
+Symmetric encryption (same key for encrypt/decrypt)
+Block cipher (encrypts data in 128-bit blocks)
+Key size: 256 bits (from SHA-256)
+Industry standard, used by governments and banks.
+
+
+Mode: CBC (Cipher Block Chaining) :
+----------------------------------- --- >
+Plaintext:  [Block1] [Block2] [Block3]
+                ↓        ↓        ↓
+IV → XOR → [Encrypt] → XOR → [Encrypt] → XOR → [Encrypt]
+                ↓        ↓        ↓
+Ciphertext: [C1]     [C2]     [C3]
+
+
+
+How CBC works:
+----------------- >
+First block: XOR plaintext with IV, then encrypt
+Second block: XOR plaintext with previous ciphertext, then encrypt
+Continue chaining...
+
+Why CBC?
+------------- .
+Each block depends on previous blocks
+Same plaintext blocks produce different ciphertext
+More secure than ECB (Electronic Codebook) mode
+CBC vs Other Modes:
+
+ECB: Each block encrypted independently (INSECURE - patterns visible)
+CBC: Blocks chained together (SECURE - no patterns)
+GCM: CBC + authentication (MORE SECURE - detects tampering)
+Padding: PKCS7
+Example: Data is 13 bytes, block size is 16 bytes
+Need to add 3 bytes of padding
+
+Original:  [H][e][l][l][o][ ][W][o][r][l][d][!][!]
+Padded:    [H][e][l][l][o][ ][W][o][r][l][d][!][!][3][3][3]
+                                                    ↑  ↑  ↑
+                                            padding value = 3
+Why padding?
+-------------------- >
+AES requires data to be multiple of 16 bytes
+If data is 13 bytes, need to add 3 bytes
+PKCS7 adds N bytes, each with value N
+PKCS7 Rules:
+
+If need 1 byte: add [1]
+If need 2 bytes: add [2][2]
+If need 3 bytes: add [3][3][3]
+If data is already 16 bytes: add full block [16][16]...[16].
+
+Why return IV?
+------------------- >
+IV must be sent with ciphertext (not secret)
+Receiver needs IV to decrypt
+IV is like a "salt" - public but necessary
+Why hexadecimal?
+
+Binary data → Hex string (easy to transmit in JSON)
+Each byte becomes 2 hex characters
+Example: byte 255 → hex "FF"
+
+
+Stateless:
+No need to store keys in database
+Key derived on-the-fly from UUID
+Simplifies key management.
+
+Transport Security:
+Encrypts sensitive data in API responses
+Even if HTTPS is compromised, data is still encrypted
+Defense in depth strategy
+
+1. The Basic Concept (Like Sending a Secret Letter)
+You want to send: "HELLO WORLD"
+Problem: Anyone can read it!
+Solution: Encrypt it with a secret key
+2. What is AES Encryption?
+Think of AES like a lock and key:
+
+┌─────────────┐         ┌─────┐         ┌─────────────┐
+│   HELLO     │  +  🔑  │ KEY │  =      │  x8f2a9b    │
+│   (Plain)   │         └─────┘         │  (Encrypted)│
+└─────────────┘                         └─────────────┘
+Key Points:
+
+Same key locks AND unlocks
+Without key, encrypted data is gibberish
+AES works on 16-byte blocks at a time
+3. The Block Problem
+AES encrypts data in 16-byte chunks (blocks):
+
+Your data: "HELLO WORLD HELLO WORLD"
+            ↓
+Split into blocks:
+┌──────────────────┐  ┌──────────────────┐
+│  HELLO WORLD     │  │  HELLO WORLD     │
+│  (Block 1)       │  │  (Block 2)       │
+└──────────────────┘  └──────────────────┘
+Problem with simple encryption (ECB mode):
+
+Block 1: "HELLO WORLD" → Encrypt → "x8f2a9b"
+Block 2: "HELLO WORLD" → Encrypt → "x8f2a9b"  ⚠️ SAME OUTPUT!
+
+Attacker sees pattern: "These two blocks are identical!"
+This is INSECURE - patterns leak information!
+
+
+
+4. What is CBC Mode? (The Solution)
+CBC = Cipher Block Chaining
+
+Think of it like a chain reaction where each block affects the next:
+
+
+ENCRYPTION FLOW:
+═══════════════════════════════════════════════════════
+
+Step 1: First Block
+┌────────┐
+│   IV   │ (Random 16-byte starter)
+│ Random │
+└───┬────┘
+    │
+    ↓ XOR (mix together)
+┌───────────────┐
+│ HELLO WORLD   │ (Block 1 - Plain text)
+└───────┬───────┘
+        │
+        ↓ Encrypt with Key 🔑
+┌───────────────┐
+│  x8f2a9b...   │ (Cipher 1)
+└───────┬───────┘
+        │
+        └─────────┐
+                  │
+Step 2: Second Block
+                  │
+                  ↓ XOR (mix with previous cipher)
+            ┌───────────────┐
+            │ HELLO WORLD   │ (Block 2 - Same text!)
+            └───────┬───────┘
+                    │
+                    ↓ Encrypt with Key 🔑
+            ┌───────────────┐
+            │  p3k9z1m...   │ (Cipher 2 - DIFFERENT!)
+            └───────────────┘
+
+Result:
+
+
+Same input "HELLO WORLD" appears twice
+But encrypted output is DIFFERENT:
+  Block 1: "x8f2a9b..."
+  Block 2: "p3k9z1m..."  ✅ No pattern visible!
+
+
+
+5. What is IV (Initialization Vector)?
+IV = Random Starting Point
+
+Think of IV like shuffling a deck of cards before dealing:
+
+Without IV (always start same way):
+  Game 1: Deal cards → Pattern A
+  Game 2: Deal cards → Pattern A  ⚠️ Predictable!
+
+With IV (shuffle first):
+  Game 1: Shuffle → Deal cards → Pattern X
+  Game 2: Shuffle → Deal cards → Pattern Y  ✅ Unpredictable!
+IV Properties:
+
+✅ Random (different every time)
+✅ 16 bytes (same size as AES block)
+✅ Public (sent with encrypted data)
+✅ NOT secret (like a salt)
+Why IV is needed:
+
+Same data + Same key + No IV = Same output (BAD!)
+Same data + Same key + Different IV = Different output (GOOD!)
+
+
+
+6. XOR Operation (The Mixing Step)
+XOR = Exclusive OR (simple mixing operation)
+
+Think of it like mixing paint colors:
+
+Binary XOR:
+  0 XOR 0 = 0
+  0 XOR 1 = 1
+  1 XOR 0 = 1
+  1 XOR 1 = 0
+
+Example:
+  Data:  01001000  (Letter 'H')
+  IV:    10110101  (Random)
+  ─────────────────
+  XOR:   11111101  (Mixed result)
+Why XOR?
+
+Fast and reversible
+Mixes data with IV/previous cipher
+Makes each block unique
+
+
+
+BACKEND (Node.js):
+══════════════════════════════════════════════════════
+
+Input Data:
+┌─────────────────────────────────────┐
+│ { email: "user@example.com",        │
+│   balance: 1000 }                   │
+└─────────────────────────────────────┘
+         │
+         ↓ JSON.stringify()
+┌─────────────────────────────────────┐
+│ '{"email":"user@example.com",...}'  │
+└─────────────────────────────────────┘
+         │
+         ↓ Split into 16-byte blocks
+┌──────────┐ ┌──────────┐ ┌──────────┐
+│ Block 1  │ │ Block 2  │ │ Block 3  │
+└──────────┘ └──────────┘ └──────────┘
+         │
+         ↓ Generate Random IV
+┌─────────────────────┐
+│ IV: a1b2c3d4e5f6... │ (16 bytes)
+└─────────────────────┘
+         │
+         ↓ Derive Key from UUID
+┌─────────────────────┐
+│ Key = SHA256(UUID)  │ (32 bytes)
+└─────────────────────┘
+         │
+         ↓ AES-CBC Encrypt
+┌─────────────────────────────────────┐
+│ Ciphertext: 9f8e7d6c5b4a3210...     │
+└─────────────────────────────────────┘
+         │
+         ↓ Convert to Hex & Return
+┌─────────────────────────────────────┐
+│ {                                   │
+│   x: "a1b2c3d4..." (IV in hex)      │
+│   y: "9f8e7d6c..." (Cipher in hex)  │
+│ }                                   │
+└─────────────────────────────────────┘
+
+
+FRONTEND (React/Vue/Angular):
+══════════════════════════════════════════════════════
+
+Step 1: Receive Encrypted Response
+┌─────────────────────────────────────┐
+│ API Response:                       │
+│ {                                   │
+│   x: "a1b2c3d4e5f6...",  (IV)       │
+│   y: "9f8e7d6c5b4a..."   (Cipher)   │
+│ }                                   │
+└─────────────────────────────────────┘
+         │
+         ↓
+Step 2: Get User's UUID (from login/storage)
+┌─────────────────────────────────────┐
+│ UUID: "550e8400-e29b-41d4-..."      │
+└─────────────────────────────────────┘
+         │
+         ↓
+Step 3: Derive Same Key
+┌─────────────────────────────────────┐
+│ Key = SHA256(UUID)                  │
+│ (Must match backend key!)           │
+└─────────────────────────────────────┘
+         │
+         ↓
+Step 4: Parse Hex to Binary
+┌─────────────────────────────────────┐
+│ IV = hex_to_bytes(x)                │
+│ Ciphertext = hex_to_bytes(y)        │
+└─────────────────────────────────────┘
+         │
+         ↓
+Step 5: AES-CBC Decrypt
+┌─────────────────────────────────────┐
+│ Plaintext = AES.decrypt(            │
+│   ciphertext,                       │
+│   key,                              │
+│   { iv, mode: CBC, padding: PKCS7 } │
+│ )                                   │
+└─────────────────────────────────────┘
+         │
+         ↓
+Step 6: Parse JSON
+┌─────────────────────────────────────┐
+│ { email: "user@example.com",        │
+│   balance: 1000 }                   │
+└─────────────────────────────────────┘
+
+
+
+11. Key Concepts Summary
+IV (Initialization Vector)
+🎲 Random 16-byte value
+📤 Sent with encrypted data (in field 'x')
+🔓 Not secret (like salt in password hashing)
+✨ Makes same data encrypt differently each time
+CBC Mode
+🔗 Chains blocks together
+🎯 Each block depends on previous block
+🛡️ Hides patterns in data
+⚡ First block uses IV, rest use previous cipher
+Key Derivation
+🔑 Key = SHA256(User's UUID)
+👤 Each user has unique key
+🔒 Same UUID always produces same key
+🚫 Can't reverse SHA256 to get UUID back
+The Flow
+1. Backend: Encrypt with Key + Random IV
+2. Send: {x: IV, y: Ciphertext}
+3. Frontend: Decrypt with Same Key + Same IV
+4. Result: Original data restored
+12. Why This Design?
+✅ Security:
+   - Each encryption is unique (random IV)
+   - Per-user keys (UUID-based)
+   - Industry standard (AES-256-CBC)
+
+✅ Simplicity:
+   - No key storage needed
+   - Key derived from UUID
+   - Frontend uses same library
+
+✅ Compatibility:
+   - CryptoJS works in browser and Node.js
+   - JSON-friendly format {x, y}
+   - Easy to integrate
+13. Common Questions
+Q: Why send IV in plain text?
+
+A: IV is not secret! It's like salt in password hashing.
+   Attacker knowing IV doesn't help without the key.
+Q: Can attacker decrypt without UUID?
+
+A: No! Key = SHA256(UUID)
+   Without UUID, can't derive key
+   Without key, can't decrypt
+Q: What if same data is encrypted twice?
+
+A: Different IV each time = Different ciphertext
+   Encryption 1: {x: "abc...", y: "123..."}
+   Encryption 2: {x: "xyz...", y: "789..."}
+   ✅ No pattern visible!
+Q: How does frontend get UUID?
+
+A: UUID is stored after login:
+   - localStorage
+   - sessionStorage
+   - Redux/Vuex store
+   - Memory (during session)
+This is how your encryption system works! The backend encrypts with a random IV, sends both IV and ciphertext to frontend, and frontend decrypts using the same key derived from the user's UUID.
+
+About  the Crypto:
+-------------------- >
+
+.> A cipher is an algorithm—a set of, steps or a formula—used in cryptography to transform readable information (plaintext) into an unreadable form (ciphertext) for security. 
+.> This module will supports different Asymmetric key types [ ref https://nodejs.org/api/crypto.html ]
+.> 
