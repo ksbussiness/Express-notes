@@ -1,0 +1,298 @@
+
+NODE JS STREAMS :
+--------------------- >
+1) What is Stream in nodejs ?
+
+>Nodejs Strems are used for working for the streaming data.
+
+The server which has the request, response, these are also called has streams,
+It is also used in the sockets, video, audios.
+
+> We use the streams for data transferring.
+> It is used to make the large data in to small chuck for better processing.
+
+Use: It will make data to be processed piece by piece (in chunks) instead of loading everything into memory at once.
+
+2) Streams are useful when working with: 
+	Large files
+	HTTP requests & responses
+	File uploads/downloads
+	Real-time data processing
+	Video/audio streaming.
+
+NOTE: Instead of reading a whole file into memory, streams read it in small chunks, which makes Node.js fast and memory-efficient.
+
+
+Why Streams Are Important :
+------------------------------- >
+Without Streams:
+	fs.readFile("largeFile.txt", (err,data) =>{
+		// loads entire file into memory 
+	});
+
+With Streams:
+const stream =fs.createReadStream("largefile.txt");
+stream.on("data", chunk=>{
+	console.log(chunk)
+}):
+::> Use less Memory, Faster for larger data, Better performance
+::> It will reduce the load on the RAM, 
+::> 
+
+::>  When we are trying to process an large file, then you server wll not handle the large, because, that file will take the majority of server RAM, Memory ane the server will be 
+crashed.
+
+Different Types of Streams in Node.js : 
+---------------------------------------- >
+Node.js has 4 main types of streams:
+   Readable Stream
+   Writable Stream
+   Duplex Stream
+   Transform Stream
+
+
+
+Work Flow with the Streaming :
+---------------------------------- >
+
+::> The files which are stored in the server, are in the form of the binaries [0,1];
+::> So, we use the readable Stream to read data from source , and chnubk the data
+::> So, we chnuk the large file and store/ Pump these chunks into the Sever's buffer 
+::> Buffer is an physical place in the server, 
+::> The, processed chunk will be takesn out from buffer and to write to the destination
+using the writable buffer.
+
+Each Stream Explanations:
+--------------------------------------- >
+
+Readable Stream:
+-------------------- >
+> A Readable stream is used to read data from a source.
+Examples of Source: FileSystem HTTP Request, Process stdin, Database Results
+
+const fs = require("fs");
+const readStream = fs.createReadStream("example.txt");
+
+readStream.on("data", (chunk) => {
+    console.log("Received chunk:", chunk.toString());
+});
+
+readStream.on("end", () => {
+    console.log("Finished reading");
+});
+
+Imp Methods: data, end, error, close:
+
+
+Writable Stream:
+----------------------- >
+A Writable stream is used to write data to a destination.
+examples: A Writable stream is used to write data to a destination.
+EX: writings to a file, Sending HTTP response, Writings Logs
+
+
+const fs = require("fs");
+
+const writeStream = fs.createWriteStream("output.txt");
+
+writeStream.write("Hello\n");
+writeStream.write("Node.js Streams\n");
+
+writeStream.end();
+
+Imp Methods:  write(), end(), on(finish)
+
+
+Duplex Stream :
+--------------------- >
+A duplx stream can both read and write data.
+
+ex: TCP sockets
+  Network Connections
+
+
+const { Duplex } = require("stream");
+
+const myStream = new Duplex({
+  read() {
+    this.push("Hello from Read side!");
+    this.push(null); // end reading
+  },
+
+  write(chunk, encoding, callback) {
+    console.log("You wrote:", chunk.toString());
+    callback();
+  }
+});
+
+// Write something
+myStream.write("Sachin");
+
+// Read something
+myStream.on("data", (chunk) => {
+  console.log("You read:", chunk.toString());
+});
+
+
+
+Transform Stream :
+-------------------------- >
+A Transform stream is a special type of Duplex stream that modifies (transforms) data while reading and writing.
+
+
+Ex: Compression, Encryption, Converting to uppercase
+
+pipe() sends data from a Readable stream directly into a Writable stream.
+
+const fs = require("fs");
+
+const readStream = fs.createReadStream("input.txt");
+const writeStream = fs.createWriteStream("copy.txt");
+
+readStream.pipe(writeStream);
+✔ Automatically handles data flow
+✔ Automatically handles backpressure
+
+
+
+ex: FILE system based Stream example:-
+----------------------------------------- >
+
+const http= require('hhtp');
+
+const fs  require('fs');
+
+const transform = require('stream');
+
+
+const server = http.createServer (( req, res) => {
+
+	if (req.url !='/') {
+		return res.end();
+	}
+
+      // Downloading big files bad way 
+       const file = fs.readFileSync('sampe.txt');
+       return res.end(file)
+
+      // Downloding big file using good way ( Streams)
+       const readableStream = fs.createReadStream('sample.txt');
+       // making the readableStream..> writableStream
+       readableStream.pipe(res);
+
+      
+      // copy-big-file-using-bad-way :
+      const file = fs.readFileSync('sample.txt');
+      fs.writeFileSync('output.txt',file);
+      res.end();
+
+     // copy big file good way :
+  
+        const readStream = fs.createReadStream('sample.txt');
+   	const writeStream = fs.createWriteStream('output.txt);
+
+   	readStream.on('data', (chunk) => {
+       	    console.log('chunk':, chunk.toString());
+            writeStream.write(chunk);
+       });
+
+     // String Processing :
+      const sampleFileStream = fs.createReadStream('sample.txt');
+      const outputWritableStream = fs.createWriteStream('output.txt');
+
+
+
+
+     // This is an manually way of doing the code here in this case: 
+      sampleFileStream.on('data', (chunk) =>{
+       console.log('data received:', chunk.toString());
+        
+	 // Processing
+         const uppercaseString = chunk.toString().toUpperCase()
+	 const finalString = uppercaseString.replaceAll('/ipsum/gi', 'cool');
+         
+	// Writable stream-write  
+        outputWritableStream.write(finalString)
+
+     // In_order make simple there is an concept called pipes in the nodeJS 
+
+      const tranformStream = new Transform({
+       transform(chunk,encoding, callback) {
+	const finalString = chunk.toString().replaceAll(/ipsum/gi,'cool');
+   	callback(null,finalString)
+     }
+     });
+
+  sampleFileStream.pipe(tranformStream)
+.on('error', (err) => {
+   console.log(err)
+})
+
+.pipe(outputWritableStream)
+.on('error', (err) =>{
+   console.log(err)
+});
+
+NOTE point: file_1.pipe(file_2)
+:::> here file_1 always needs to be readable
+:::> here file_2 always needs to be writable
+
+
+
+
+      });
+
+
+
+   res.end();
+
+
+});
+
+
+const PORT = process.env.PORT || 5700;
+
+server.listen(PORT, {} => console.log(`Listening on port ${PORT}`));
+
+
+
+req: The req method is an readableStream
+res: The res method is an WritableStream
+
+
+
+
+
+# Inbuild stream Methods Using :-
+---------------------------------------- >
+NOTE: // In the above line we can set an highWaterMark, Which is nothing but an Threshold value,
+for the buffer, here while reading the content and storing that content in the foam of chunks in buffer, we, are setting an limit, for an buffer, saying that if the buffer memory size is used for then this highwaterMark limit we get False, otherwise True.
+const readableStream = new Readable({ highWaterMark:6,  read() {} });
+
+
+const { Readable } = require('stream');
+
+const readableStream = new Readable({ read() {} });
+
+readableStream.on('data', (chunk) => {
+
+    console.log('Data coming:', chunk.toString());
+    writableStream.write(chunk)
+
+});
+
+console.log(readableStream.push("Hello f")
+
+
+
+const writableStream = new Writable({ write(s) { console.log('Writing',s.toString()) } })
+
+writableStream.write('Hello')
+
+
+# Inbuild Tr
+ 
+
+
+
+
