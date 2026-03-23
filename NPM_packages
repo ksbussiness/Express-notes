@@ -1,0 +1,202 @@
+NPM Packages Info :
+--------------------- >
+ npm init : Initialize the project 
+ npm: Node.js package manager for code sharing.
+
+ Package: Reusable code or library.
+ Package.json: Defines package metadata and dependencies.
+ Versioning: Manages different package versions.
+ Local/Global: Install packages locally, globally.
+ Registry: Public storage for open-source
+
+
+ Npm install <package-name>:
+ ----------------------------------- >
+
+ # -save: Adds the package to the project's dependencies in package.json.
+
+ # -save-dev : Adds the package to the project's devDependencies.
+ ( used only in development) in package.json.
+
+ # -g : Installs the package global, making it available system-wide, not just in a specific project.
+
+ # -save-exact: Installs the exact version specified without updating for newer versions.
+
+ # -force :Forces npm to fetch and install packages even if the are already installed.
+
+
+ note: 
+ ------ >
+ # The difference between --save and --save-dev in npm is about where the dependency is used in your project.
+
+
+ # npm install package --save:
+ > This adds the package to dependencies in package.json.
+ > The package is needed in production (runtime), Your app cannot run without it.
+ 
+ # npm install package --save-dev
+ > Adds the package to devDependencies.
+ > The package is needed only during development
+ > Not required for running the app in production
+Node.js Package Management – npm & npx Guide
+
+===========================================
+🔧 What is npm?
+-------------------------------------------
+npm = Node Package Manager
+- Comes with Node.js
+- Manages dependencies, installs packages
+- Works with package.json & package-lock.json
+
+===========================================
+🚀 What is npx?
+-------------------------------------------
+npx = Execute npm packages without installing them globally
+- Runs CLI tools and one-time packages
+- Comes with npm v5.2+ and above
+
+===========================================
+✅ npm – General Commands
+-------------------------------------------
+1. Initialize a project:
+   npm init
+   npm init -y   # skip questions
+
+2. Install a package:
+   npm install lodash
+
+3. Install all from package.json:
+   npm install
+
+4. Uninstall a package:
+   npm uninstall lodash
+
+5. Update packages:
+   npm update
+
+6. List installed packages:
+   npm list         # local
+   npm list -g      # global
+
+7. Check outdated packages:
+   npm outdated
+
+===========================================
+📁 Dependency Management
+-------------------------------------------
+1. Install as dev dependency:
+   npm install typescript --save-dev
+
+2. Install specific version:
+   npm install express@4.17.1
+
+3. Install globally:
+   npm install -g nodemon
+
+4. Install from GitHub or URL:
+   npm install user/repo
+   npm install https://github.com/user/repo.git
+
+===========================================
+🚀 Using npx – Execute Packages
+-------------------------------------------
+1. Run a package without installing:
+   npx create-react-app my-app
+
+2. Run local binaries:
+   npx eslint myfile.js
+
+3. Run a specific version:
+   npx eslint@7.32.0 file.js
+
+4. Avoid global installs:
+   npx nodemon index.js
+
+===========================================
+📄 package.json – Overview
+-------------------------------------------
+Example:
+
+{
+  "name": "my-app",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "jest": "^27.0.6"
+  }
+}
+
+Run scripts:
+   npm run start
+   npm run test
+   (or simply: npm start, npm test)
+
+===========================================
+🧷 package-lock.json
+-------------------------------------------
+- Auto-generated
+- Locks the exact version of installed packages
+- Ensures consistency across installs
+
+===========================================
+🌐 Global vs Local Packages
+-------------------------------------------
+| Feature       | Local                | Global              |
+|---------------|----------------------|----------------------|
+| Location      | node_modules         | System-wide          |
+| Use case      | App dependencies     | CLI tools            |
+| Available via | require() in code    | Terminal / CLI       |
+
+===========================================
+💡 Useful npm Tips
+-------------------------------------------
+1. View help:
+   npm help install
+
+2. View package info:
+   npm info express
+
+3. Clean cache:
+   npm cache clean --force
+
+4. Check for vulnerabilities:
+   npm audit
+   npm audit fix
+
+5. Remove node_modules and reinstall:
+   rm -rf node_modules package-lock.json
+   npm install
+
+===========================================
+🧪 Common Scenarios
+-------------------------------------------
+1. Create a new project:
+   mkdir my-app && cd my-app
+   npm init -y
+   npm install express
+
+2. Install a dev tool:
+   npm install eslint --save-dev
+   npx eslint --init
+
+3. Run local server:
+   npm install nodemon --save-dev
+   npx nodemon index.js
+
+===========================================
+❓ When to Use npm vs npx
+-------------------------------------------
+| Use Case                        | Tool |
+|-------------------------------- |------|
+| Installing packages             | npm  |
+| Running packages (one-time use) | npx  |
+| Running local CLI tools         | npx  |
+| Managing dependencies           | npm  |
+
+===========================================
