@@ -84,3 +84,118 @@ app.use(helmet());
 
 Note: It should be combined with other security mechanisms like input validation, authentication, CSRF protection, and rate limiting to build a secure backend system.
 
+
+
+========================================================================================================================================================================================================================================================================================================================================================================
+========================================================================================================================================================================================================================================================================================================================================================================
+
+
+Rate Limiting :
+---------------------- >
+ >> Rate limiting protects your API from abuse — brute force attacks, DDoS, scraping, and runaway clients. The idea is  simple: you only allow N requests from one IP (or user) in a time window.
+>>  Rate limiting = controlling how many requests a client can make in a given time.
+
+ex: npm install express-rate-limit
+
+const rateLimit = require('express-rate-limit');
+
+// Basic global limiter
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,  // 15 minutes
+  max: 100,                   // 100 requests per window per IP
+  standardHeaders: true,      // sends X-RateLimit-* headers
+  legacyHeaders: false,
+  message: {
+    status: 429,
+    error: "Too many requests, please try again later."
+  },
+});
+
+app.use(globalLimiter);
+
+// Stricter limiter for login endpoint (brute force protection)
+const loginLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,  // 10 minutes
+  max: 5,
+  message: "Too many login attempts, please try again later.",
+});
+
+app.post('/api/login', loginLimiter, loginController);
+
+
+We use this bascially for the :
+---------------------------------------- >
+
+>> Prevent DDoS attacks
+>> Stop brute-force login attempts
+>> Avoid API abuse
+>> Protect server resources
+
+
+express-rate-limit : It is an middleware for Express.js
+
+What it will do :
+-------------------------- >
+>> Identify user (usually by IP address).
+>> Store count in memory (or Redis).
+>>
+
+
+User → Request → Server
+                ↓
+         Check counter
+                ↓
+     Under limit? → YES → Allow
+                   NO  → Block
+
+>> keyGenerator: (req) => req.user.id ,,  Limits per user instead of IP.
+
+Now the current set up is , User can make 5 requests in 10 minutes, 
+After that  ,completely blocked, And must wait full 10 minutes.
+
+
+
+
+
+
+There are different Types of the Rate Limiting Algorithms :
+---------------------------------------------------------------------------- >
+1) Fixed Window (used here)
+2) Sliding Window
+3) Token Bucket ⭐ (best for production)
+4) Leaky Bucket
+
+
+
+
+Token Based Rate Limit:
+--------------------------------- >
+>> Token bucket allows requests as long as tokens are available, and tokens are refilled gradually over time.
+
+Start: 5 tokens
+User sends 5 requests → ✅✅✅✅✅ (bucket empty)
+Next request → ❌ blocked
+After 10 sec → +1 token → ✅ allowed
+
+
+
+
+Difference between Windows Based and Token based Rate Lmits:
+------------------------------------------------------------------------------------ >
+##  Express-rate-limit uses a fixed window algorithm, where a user can make a fixed number of requests within a time window, after which they are blocked until the window resets.
+
+##  Token bucket, on the other hand, allows requests based on available tokens that refill over time. It supports burst traffic while maintaining a steady rate, making it more flexible and production-friendly.
+
+Express-rate-limit uses a fixed window approach where a user can make a limited number of requests in a fixed time, and after that they are blocked completely until the window resets.
+
+Token bucket works differently — it gives tokens that are consumed per request and refilled over time. This allows burst requests but still controls the overall rate, making it smoother and more flexible.
+
+
+
+========================================================================================================================================================================================================================================================================================================================================================================
+========================================================================================================================================================================================================================================================================================================================================================================
+
+
+
+
+
