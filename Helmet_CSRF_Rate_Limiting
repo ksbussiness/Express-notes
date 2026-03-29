@@ -1,1 +1,86 @@
+Helment.js::  Rate Limiting :: CSRF protection
+
+
+Helmet.js:
+-------------------- >
+# Helmet.js is an Express middleware that sets various HTTP response headers to protect your application from well-known web vulnerabilities. 
+# Helmet → browser-level protection
+
+# Those headers are not just metadata — they directly control how browsers behave, and that affects your app’s security.
+# Helmet.js adds security-related HTTP headers automatically so you don’t have to manually configure them.
+
+Without Helmet What happens:
+------------------------------------------- >
+
+By using the helmet :
+------------------------------- >
+X-Frame-Options: DENY
+>>> Completely blocks your site from being loaded in any iframe
+
+#  Clickjacking attack
+
+What this attack will do:
+
+1. Attacker creates a malicious page
+They design a page that looks normal (like a game, button, or reward).
+2. They embed your app in an invisible iframe.
+<iframe src="https://your-app.com/delete-account" style="opacity:0; position:absolute;"></iframe>
+3.They place fake UI.
+A button saying 👉 “Click here to win ₹1000”
+But behind that button…
+👉 The real button is from your app (like “Delete Account” or “Transfer Money”)
+
+
+# XSS (Cross-Site Scripting policy ) :
+  >>> CSP restricts which scripts can run and helps mitigate XSS, but it must be configured properly.
+  >>>  It can completely block inline script injection even if an attacker finds an XSS hole.
+
+What this attack will do:
+Attackers inject scripts into your app.
+
+# MIME sniffing attacks :
+  >>> Normally , servers tell browsers what a file is using a header.
+     ex: content-Type: text/html 
+  >>> This is an HTML, render it as a webpage.
+
+By usning helmet ::  X-Content-Type-Options: nosniff 
+here, Tell browser "Do not Guess"
+
+# X-Content-Type-Options: nosniff: 
+  >>> Browser tries to guess file types → can execute malicious files.
+  >>> Browsers sometimes ignore the header and try to guess (sniff) the file type.
+
+# Information Leakage:
+  >>> Your server might expose tech stack like: X-Powered-By: Express
+  >>> Helmet removes it → attackers get less info.
+
+# Cross-Origin-Resource-Policy (CORP)
+  >>> Helmet adds this: Cross-Origin-Resource-Policy: same-origin
+  >>>  It Prevents other sites from loading your resources.
+
+
+# Cache-Control
+  >>> Helmet adds This:  Cache-Control: no-store
+  >>> Helmet does NOT automatically set Cache-Control: no-store
+  >>> You must configure it manually
+
+ex: Prevents sensitive data from being cached
+
+# Strict-Transport-Security (HSTS)
+  >>> With out this , any can be used like, http, https, etc
+  >>> When we enable this, Strict-Transport-Security 
+  Forces to use HTTPS
+
+Implementation of the Helmet in Express:
+-------------------------------------------------------- >
+npm install helmet
+
+const express = require('express');
+const helmet = require('helmet');
+const app = express();
+
+// Simplest usage — enables ALL defaults at once
+app.use(helmet());
+
+Note: It should be combined with other security mechanisms like input validation, authentication, CSRF protection, and rate limiting to build a secure backend system.
 
