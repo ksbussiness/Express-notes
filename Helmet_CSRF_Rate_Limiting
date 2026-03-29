@@ -196,6 +196,48 @@ Token bucket works differently — it gives tokens that are consumed per request
 ========================================================================================================================================================================================================================================================================================================================================================================
 
 
+CSRF (Cross-Site Request Forgery) :
+------------------------------------------------- >
+>> CSRF is when a malicious website tricks a logged-in user’s browser into sending a request to your server without their consent.
+
+>>  CSRF Token: This adds a secret token that attacker cannot guess.
+
+Npm package: npm install csurf
+
+
+Code: 
+const csrf = require("csurf");
+const cookieParser = require("cookie-parser");
+
+app.use(cookieParser());
+
+const csrfProtection = csrf({ cookie: true });
+
+app.get("/form", csrfProtection, (req, res) => {
+  res.json({ csrfToken: req.csrfToken() });
+});
+
+app.post("/transfer-money", csrfProtection, (req, res) => {
+  res.send("Money transferred safely ✅");
+});
+
+
+
+Alternative (Modern Approach) :
+----------------------------------------- >
+res.cookie("session", "abc123", {
+  httpOnly: true,
+  sameSite: "Strict"
+});
+
+This does : 
+--------------- >
+Prevents cookies being sent from other sites
+Stops CSRF at browser level.
+
+>> In order to stay protected from CSRF attacks, then we need to use the JWT, 
+
+
 
 
 
