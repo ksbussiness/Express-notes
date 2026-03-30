@@ -1,0 +1,77 @@
+
+
+Node Packages :
+---------------------------- >
+>> A package is a reusable piece of code (library/module) that solves a specific problem.
+
+> we can work with the individual file with the node, But , individual file depends on other file and 
+..... etc , then dependencies become more challenges.
+
+Why we need to packages:
+-------------------------------- >
+> Avoid writing everything from scratch
+> Reuse community-tested code.
+> Faster developement
+Problem without Packages:
+--------------------------------- >
+> Managing dependencies manually becomes complex
+> Version conflicts
+> Hard to scale projects
+
+
+
+Package.json:
+---------------- >
+> It is an bluePrint of the current packages and all its dependencies.
+> In the packages we have the versioning
+   lets say :
+ EX:   Semantic Versioning
+   "fetch" :  "^1.1.0",   1. major ,   1. minor,  .0 patch
+   >> Means install version 1.1.0 or later but do not go beyond major release 1. ,
+  anything after 1.1.0 and under <2.0.0
+  
+"fetch" : "~7.6.0"
+  >> Means install version 7.6.0 or later but donot go beyond minor 6 
+  >> That is anything after 7.6.0 and under <7.7.0 
+
+
+MAJOR.MINOR.PATCH
+1.1.0
+
+Package-lock.json
+---------------------- >
+
+>> Package.json describe the latest possible
+
+>> This file is nothing but the Snapshot of what the dev installed exactly
+>> This file contains the about each package version and thir dependencies.
+>> This is used for Consistency, has, ALL dependencies of packages.
+>> 
+ 
+
+Node_modules:
+-------------------------- >
+>> All the DownLoaded packages will go to node_modules folder.
+>> This contains all the downloaded packages.
+
+Package manager:  (npm / yarn / pnpm ) :--
+----------------------- >
+>> You can do this yourself ( if you want )
+>> Or use a package manager that 
+       That hosts and manages packages 
+       Download and install packages
+       Updates packages.json and packagelock,json
+>>  npm init creates a package.json
+
+Install packages,
+Manage versions
+Update dependencies
+Maintain dependencies
+
+>> What happens if package-lock.json is deleted ?
+npm will 
+recalculate dependencies.
+Install latest allowed versions.
+
+What is npm init -y?
+>> Creates package.json with default values
