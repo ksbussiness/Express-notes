@@ -1,0 +1,93 @@
+
+The different timeOuts:
+
+connection timeOuts
+
+read Request timeOuts
+wait TimeOuts
+usage timeOuts
+respone timeOuts
+cancelling an request
+
+Basically Timeouts control how long a system waits at different stages of a request lifecycle.
+1. Connection Timeout  : Time allowed to establish a connection between client and server.
+
+2. Read Request Timeout (Read Timeout) :
+> Time to receive data AFTER connection is established
+> Connection is successful, but server is slow to send response.
+> Generally happen at the : Slow database query , Heavy processing , Server overload
+
+3. Wait Timeout (Idle Timeout)
+> How long a connection can stay idle (no activity) before closing.
+> If no query is executed for 10 sec → connection closed
+> we see this in the Important in DB connection pools
+
+4. Usage Timeout (Execution Timeout) :
+> Maximum time allowed to execute a task/process in an api call.
+> we generally get this at the : Long loops, CPU-heavy tasks, Prevent blocking.
+
+5. Response Timeout :
+>  Total time allowed for full response cycle
+> This includes , connections + processing + sending response|
+> If request not completed in specified time we get the errors.
+
+6. Cancelling a Request :
+> Force stop a request before it completes
+> Request is manually cancelled
+
+
+ProcessExit Codes :
+
+> process.exit() is a function in Node.js that stops your program immediately.
+Syntax: process.exit(code)
+
+process → global object in Node.js
+exit() → tells Node: "stop execution NOW"
+
+
+Here : The code is called an exit code , That number is called an exit code.
+
+
+
+# Process.exit(0)
+> Means: Success / Normal exit
+> This is used When Task Completed successfully. And No errors.
+
+# Process.exit(1)
+> Means: Failure / Error happened
+> This is used, when unexpected errors, validation failed, Crash Situation.
+
+
+Note : We can not randloly use the numbers, The valid range is 0–255 (standard OS exit codes)
+
+
+> process.exit(), This is very powerfull, It can 
+❌ Stops event loop immediately
+❌ Cancels pending async tasks
+❌ Can drop requests (Express, Socket.IO)
+
+
+
+>> These below are an functions to get the signal from the OS to call some functions
+process.on('SIGTERM' 
+process.on('SIGINT', 
+>> This is about graceful shutdown using OS signals.
+>> These means, When the system sends a signal to stop the app, run this function before exiting.”
+
+
+# Process.on() : It listens to events emitted by Node.js process
+
+Syantax:  process.on(eventName, callback)
+
+>> So in the above example: 
+So here:
+'SIGTERM' → event name
+gracefulShutdown → function to run
+
+
+
+
+SININT  ===> ctrl+c
+SIGTERM (Termination signal)
+SIGKILL : Force kill (cannot be caught)
+SIGHUP : Terminal closed / restart signal
