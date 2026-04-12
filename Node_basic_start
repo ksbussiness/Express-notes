@@ -1,0 +1,158 @@
+
+
+Video : 1
+------------- >
+
+> Javascript Runtime: Node js is an open source, cross-platform runtime environment for executing javascript code [ which means it can run on windows , mac, linux etc] outside of a browser.
+
+> Node js is a js in a different environment means  running JS on the server or ny computer.
+
+> Built on the chrome V8 engine: It runs on the v8 engine,  which compiles jsvascript directly to native machine code, enhancing performance.
+
+> V8 is written in C++ for speed.
+> V8 + Backed Features = NodeJS.
+
+
+What is an NodeJs ?
+
+> Design : Features an event-Driven, non blocking I/O model for efficiency.
+
+> Allows using javaScript on both server and client sides.
+scalability : ideal for scalable network applications
+due to its architechture.
+
+> Suitable for web, real-time chat and TEST API servers.
+
+NODE JS Features :
+------------------------- >
+# Non Blocking Input/outPut : 
+>> Designed to perform non-blocking operations by default, making it Suitable for I/O-heavy operations
+
+> In Node.js, everything revolves around events.
+> Node.js does NOT wait for slow operations (I/O)
+
+I/O = INput/outPut
+file readings 
+Database calls
+Api requests 
+network operations
+
+# Networking Support:
+>> Supports TCP/UDP sockets, which are crucial for building, lower, level, network applications that browsers can't handle.
+
+#  File system Access: Provides API's to read and write files, directly which is not possible in browsers environments for security.
+
+# Server-side Capabilities: Node. js enables javascript to run on the server, handling HTTP requests, file operations, and other server-side functionalities.
+
+# Modules: Organize code in to reusable modules using requires().
+
+
+Feature which are not there in the NODE:
+------------------------------------------- >
+> Window Object : The global window object , which is part of web browsers, is absent in node.js.
+
+> DOM Manipulations: Node js does not have a built-in Document Object Model (DOM).
+
+> BOM browser object model: No direct interactions with things like navigator or screen which are part of BOM in browsers.
+
+> Web-Specific Apis: API's like localStorage, sessionStorage, and browser-based fetch are not available in node.js.
+
+
+
+
+EVENT LOOP, WORKER THREAD, THREAD POOL:
+============================================== >
+
+Which mean when client is requested, 
+that request will comes to the EVENT LOOP, then this 
+event loop is single-thread, non blocking.
+which means the event loop is having only single thread but it can handle multiple events at a time.
+> when an request comes to the EVENT LOOP, then 
+that request is taken by the EVENT LOOP and 
+here, 
+[[
+    > Node.js uses a fixed thread pool (via libuv),
+    > default size = 4 threads, 
+    > Threads are reused, not created per request.
+    ]]
+If it is an light weight, then it will be handled by the EVENT-LOOP only, other wise 
+
+it will assigns the task to an existing WORKER thread in the thread pool by calling to it.
+If that Worker thread completed that work , then 
+that work will be placed, in the callback queue, then
+event loop picks that CALL-BACK and executes it,
+sending the response to the clients.
+
+Note : If the thread pool is full, Then tasks will be delayed, response time increases, But server does NOT crash.
+
+Note: Yes, we can increase the Thread pool size,  Max : 128 
+
+Note: Node.js is fast because it avoids threads- not because it uses many threads.
+
+Part-6:
+----------->
+
+V8 : Opens-source javascript engine by Google.
+ > Used in chrome and node js.
+ > Compiles javascript to native machine code.
+ > Ensures high-performance javascript execution.
+
+ Libuv:
+ > Multi-platform support library for node js.
+ > Handles asynchronous I/O operations.
+ > Provide event-driven architecture.
+ > Manages file system, networking, and timers non blockingly across platforms.
+
+ >> Internally event loops executes all these things:
+ timers:this phase executes callbacks, scheduled by setTimeout() and setInterval().
+ >> pending callbacks: executes I/O callbacks defereed to the next loop iterations.
+
+ >> idle, prepare: only used internally.
+ >> poll: retrieve new I/O events: execute I/O
+ related callbacks, the ones scheduled by timers, and setImmedeiate();
+check: setImmedeiate() callbacks are invoked here.
+close callbacks: some close callbacks  
+
+
+
+
+NPM Packages Info :
+--------------------- >
+ npm init : Initialize the project 
+ npm: Node.js package manager for code sharing.
+
+ Package: Reusable code or library.
+ Package.json: Defines package metadata and dependencies.
+ Versioning: Manages different package versions.
+ Local/Global: Install packages locally, globally.
+ Registry: Public storage for open-source
+
+
+ Npm install <package-name>:
+ ----------------------------------- >
+
+ # -save: Adds the package to the project's dependencies in package.json.
+
+ # -save-dev : Adds the package to the project's devDependencies.
+ ( used only in development) in package.json.
+
+ # -g : Installs the package global, making it available system-wide, not just in a specific project.
+
+ # -save-exact: Installs the exact version specified without updating for newer versions.
+
+ # -force :Forces npm to fetch and install packages even if the are already installed.
+
+
+ note: 
+ ------ >
+ # The difference between --save and --save-dev in npm is about where the dependency is used in your project.
+
+
+ # npm install package --save:
+ > This adds the package to dependencies in package.json.
+ > The package is needed in production (runtime), Your app cannot run without it.
+ 
+ # npm install package --save-dev
+ > Adds the package to devDependencies.
+ > The package is needed only during development
+ > Not required for running the app in production
