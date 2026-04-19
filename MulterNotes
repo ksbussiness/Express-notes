@@ -55,3 +55,79 @@ exports.uploadFile = (req, res) => {
         res.send({ message: 'File uploaded successfully!', file: req.file });
     });
 }
+
+
+====================================================================================================================== >
+
+const ds = multer.diskStorage({
+    destination: (req, file, cb) => {
+
+        cb(null, "uploads/")
+
+    },
+    filename: (req, file, cb) => {
+
+        cb(null, Date.now() + file.originalname)
+
+    }
+});
+
+
+
+
+
+
+//multer.diskStorage({..}) 
+/* 
+
+.> A method from the multer library to define how and where files should be stored on the server.
+
+..>  It allows you to customize the destination folder and filename for uploaded files.
+
+.> destination: A key in the diskStorage configuration to specify where the file should be saved.
+
+..> req: Represents the incoming request from the client.
+
+..> file: Represents the uploaded file object.
+
+..> cb: A callback function to pass the final destination path.
+
+
+.> filename: A key in the diskStorage configuration to specify how the uploaded file should be named.
+
+..> cb: The callback function to set the final filename.
+
+.> Date.now(): A timestamp to ensure unique filenames.
+
+*/
+
+
+const upload111 = multer({
+    storage: ds,
+    limits: {
+        fileSize: 1024 * 1024 * 5 // Limit file size to 5MB
+    }
+});
+
+
+
+
+
+/*
+..> multer({...}): Initializes multer with the specified options.
+..> Specifies the storage configuration (ds)
+*/
+
+app.post('/upload', upload111.single('file'), (req, res, next) => {
+    res.send("uploaded succesfully")
+}
+)
+
+
+
+
+/* 
+..> Middleware from multer to handle a single file upload.
+..> The argument 'file' matches the key of the file in the client's request (e.g., <input type="file" name="file">).
+*/
+
