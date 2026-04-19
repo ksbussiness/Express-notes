@@ -1,3 +1,9 @@
+data.csv :
+--------------- >
+name,email,age
+demo,demo@gmail.com,13remo,remo@gmail.com,13
+
+
 >> This notes tells us to write and read data from the csv.
 
 We need to have thisin the directory,  uploads/data.csv
