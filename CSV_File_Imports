@@ -1,0 +1,78 @@
+>> This notes tells us to write and read data from the csv.
+
+We need to have thisin the directory,  uploads/data.csv
+We need to have the import fastcsv from 'fast-csv';
+
+
+
+import fs from 'fs';
+import path from 'path';
+import fastcsv from 'fast-csv';
+import FormData from '../models/fromData.js'; // your mongoose model
+
+const csvFilePath = path.join('uploads', 'data.csv');
+
+// POST /submit - Save to MongoDB + Append to CSV (all inline, no separate function)
+export const saveData = async (req, res) => {
+    try {
+        const { name, email, age } = req.body;
+
+        if (!name || !email || !age) {
+            return res.status(400).json({ error: 'All fields are required' });
+        }
+
+        // Save to MongoDB
+        const newEntry = new FormData({ name, email, age });
+        await newEntry.save();
+
+        // Append to CSV inline
+        const fileExists = fs.existsSync(csvFilePath);
+        const ws = fs.createWriteStream(csvFilePath, { flags: 'a' });
+        const csvStream = fastcsv.format({ headers: !fileExists, writeHeaders: !fileExists });
+
+        csvStream.pipe(ws)
+            .on('finish', () => {
+                console.log('CSV writing completed');
+                res.status(201).json({ message: 'Data saved to MongoDB and CSV' });
+            })
+            .on('error', (err) => {
+                console.error('Error writing CSV:', err);
+                res.status(500).json({ error: 'Error writing CSV file' });
+            });
+
+        csvStream.write({ name, email, age });
+        csvStream.end();
+
+    } catch (err) {
+        console.error('Error saving data:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+// GET /csv - Read from CSV and return JSON (unchanged)
+export const readCSV = (req, res) => {
+    try {
+        const results = [];
+
+        if (!fs.existsSync(csvFilePath)) {
+            return res.status(404).json({ error: 'CSV file not found' });
+        }
+
+        fs.createReadStream(csvFilePath)
+            .pipe(fastcsv.parse({ headers: true }))
+            .on('data', row => results.push(row))
+            .on('end', () => {
+                res.json(results);
+            })
+            .on('error', err => {
+                console.error('Error reading CSV:', err);
+                res.status(500).json({ error: 'Error reading CSV file' });
+            });
+    } catch (err) {
+        console.error('Error:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+
+
