@@ -200,3 +200,21 @@ Run scripts:
 | Managing dependencies           | npm  |
 
 ===========================================
+
+npm list
+npm list -g
+npm inti
+npm init -y
+npm install
+npm update
+npm outdated
+npm help install
+npm info express
+npm cache clean --force
+npm audit
+npm audit fix
+npx { Execute npm packages }
+
+
+
+
