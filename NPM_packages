@@ -200,7 +200,7 @@ Run scripts:
 | Managing dependencies           | npm  |
 
 ===========================================
-
+npm -v  :: check npm version
 npm list
 npm list -g
 npm inti
@@ -210,10 +210,35 @@ npm update
 npm outdated
 npm help install
 npm info express
-npm cache clean --force
+npm cache clean --force   :: clean 
+npm cache verify :: to verify
 npm audit
 npm audit fix
 npx { Execute npm packages }
+
+
+
+
+
+
+
+
+
+==> npm install VS npm ci 
+
+npm install: 
+----------------- >
+What it does:
+>> Installs dependencies
+>> Updates package-lock.json if needed
+>> Can slightly change versions
+
+npm ci : 
+---------------- > 
+What it does:
+>> Deletes node_modules
+>> Installs EXACT versions from package-lock.json
+>> Faster than npm install
 
 
 
