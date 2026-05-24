@@ -242,4 +242,38 @@ What it does:
 
 
 
+npm doctor checks whether your npm environment is healthy.
+npm docter  
+npm ping
+
+npm explain : npm explain is a very useful debugging command in npm.
+>> It tell you why this package is installed in myb project
+Syntax: npm explain <package-name>
+              npm explain express
+
+npm find-dupes :  npm find-dupes is a command in npm used to detect:
+Duplicate packages inside your node_modules
+
+npm dedupe --dry-run 
+>> The above command will do this, It CHECKS duplicates, But DOES NOT modify anything
+
+npm dedupe : Remove duplicate dependency packages from node_modules
+npm dedupe -g
+
+npm ll : List installed packages 
+npm ls : List installed packages 
+npm whoami : Display npm username
+npm restart : Restart a package 
+npm view : View Registry info 
+
+
+
+
+
+
+
+
+
+
+
 
